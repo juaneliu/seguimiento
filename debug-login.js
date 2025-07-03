@@ -10,12 +10,12 @@ async function testLogin() {
     
     // 1. Verificar conexión a la base de datos
     console.log('\n1. Testing database connection...')
-    const userCount = await prisma.usuario.count()
+    const userCount = await prisma.usuarios.count()
     console.log(`✅ Database connected. Found ${userCount} users.`)
     
     // 2. Buscar el usuario admin
     console.log('\n2. Finding admin user...')
-    const admin = await prisma.usuario.findUnique({
+    const admin = await prisma.usuarios.findUnique({
       where: { email: 'admin@saem.gob.mx' }
     })
     
