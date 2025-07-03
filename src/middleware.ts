@@ -212,7 +212,8 @@ function validateRequest(request: NextRequest): { valid: boolean; reason?: strin
       'http://192.168.1.131:3000',
       'https://192.168.1.131:3000',
       'http://192.168.1.131:3001',
-      'https://192.168.1.131:3001'
+      'https://192.168.1.131:3001',
+      'https://seguimiento.saem.gob.mx'
     ]
     
     // En desarrollo, ser más permisivo con los orígenes
@@ -377,7 +378,7 @@ export function middleware(request: NextRequest) {
     if (!request.cookies.get(CSRF_COOKIE)) {
       const csrfToken = generateCSRFToken()
       response.cookies.set(CSRF_COOKIE, csrfToken, {
-        httpOnly: true,
+        httpOnly: false, // Permitir acceso desde JavaScript
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/'

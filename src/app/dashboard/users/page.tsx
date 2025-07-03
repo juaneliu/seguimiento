@@ -32,6 +32,7 @@ import {
 import { showConfirm, showSuccess, showError } from '@/lib/notifications'
 import { SimpleUserModal } from '@/components/ui/simple-user-modal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { apiPost, apiGet, apiPut, apiDelete, apiPatch } from '@/lib/api'
 
 type Usuario = {
   id: number
@@ -76,7 +77,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/users')
+      const response = await apiGet('/api/users')
       const data = await response.json()
       
       if (response.ok) {
@@ -107,13 +108,7 @@ export default function UsersPage() {
     setCreateLoading(true)
     
     try {
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      })
+      const response = await apiPost('/api/users', formData)
 
       const data = await response.json()
 
@@ -148,9 +143,7 @@ export default function UsersPage() {
 
     if (confirmed.isConfirmed) {
       try {
-        const response = await fetch(`/api/users/${id}`, {
-          method: 'DELETE',
-        })
+        const response = await apiDelete(`/api/users/${id}`)
 
         if (response.ok) {
           await showSuccess('¡Usuario eliminado!', 'El usuario ha sido eliminado exitosamente')
@@ -176,13 +169,7 @@ export default function UsersPage() {
 
     if (confirmed.isConfirmed) {
       try {
-        const response = await fetch(`/api/users/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ activo: !currentStatus }),
-        })
+        const response = await apiPatch(`/api/users/${id}`, { activo: !currentStatus })
 
         if (response.ok) {
           await showSuccess(
@@ -271,11 +258,7 @@ export default function UsersPage() {
     try {
       let response, data
       if (editUserId) {
-        response = await fetch(`/api/users/${editUserId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, password: formData.password || undefined })
-        })
+        response = await apiPatch(`/api/users/${editUserId}`, { ...formData, password: formData.password || undefined })
         data = await response.json()
         if (response.ok) {
           await showSuccess('¡Usuario actualizado!', 'El usuario ha sido actualizado exitosamente')
@@ -283,11 +266,7 @@ export default function UsersPage() {
           await showError('Error al actualizar usuario', data.error || 'Ocurrió un error inesperado')
         }
       } else {
-        response = await fetch('/api/users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        })
+        response = await apiPost('/api/users', formData)
         data = await response.json()
         if (response.ok) {
           await showSuccess('¡Usuario creado!', 'El usuario ha sido creado exitosamente')

@@ -303,12 +303,14 @@ function DirectorioPageContent() {
                       <p className="text-slate-600 dark:text-slate-400">
                         No hay registros en el directorio.
                       </p>
-                      <Link href="/dashboard/directorio/crear" className="mt-4 inline-block">
-                        <Button className="bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Crear primer registro
-                        </Button>
-                      </Link>
+                      {canEdit && (
+                        <Link href="/dashboard/directorio/crear" className="mt-4 inline-block">
+                          <Button className="bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Crear primer registro
+                          </Button>
+                        </Link>
+                      )}
                     </>
                   )}
                 </div>
