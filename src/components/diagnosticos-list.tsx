@@ -111,14 +111,14 @@ export function DiagnosticosList() {
   // Mostrar loader durante la hidratación
   if (!isClient) {
     return (
-      <Card className="bg-white">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="bg-white shadow-lg border-slate-200">
+        <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-50 border-b border-slate-200">
+          <CardTitle className="flex items-center gap-2 text-slate-800">
             <Building className="h-5 w-5" />
             Diagnósticos por Municipio
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-slate-50">
           <div className="flex items-center justify-center py-12">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
@@ -131,14 +131,14 @@ export function DiagnosticosList() {
   }
 
   return (
-    <Card className="bg-white">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="bg-white shadow-lg border-slate-200">
+      <CardHeader className="bg-gradient-to-r from-slate-100 to-blue-50 border-b border-slate-200">
+        <CardTitle className="flex items-center gap-2 text-slate-800">
           <Building className="h-5 w-5" />
           Diagnósticos por Municipio
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="bg-slate-50">
         <div className="space-y-4">
           {diagnosticosMunicipios.length === 0 ? (
             <div className="text-center py-12">
@@ -163,7 +163,7 @@ export function DiagnosticosList() {
             diagnosticosMunicipios.map((diagnostico) => (
             <div
               key={diagnostico.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border rounded-lg hover:bg-gray-50 transition-colors gap-3 sm:gap-4"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md hover:bg-gradient-to-r hover:from-slate-50 hover:to-blue-50 transition-all duration-200 gap-3 sm:gap-4"
             >
               <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 {getEstadoIcon(diagnostico.estado)}

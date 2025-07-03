@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, ArrowLeft, Save, FileText } from "lucide-react"
+import { Calendar, Save, FileText } from "lucide-react"
 import { showSuccess, showError } from "@/lib/notifications"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAcuerdosSeguimiento } from "@/hooks/use-acuerdos-seguimiento"
 
@@ -174,67 +173,67 @@ export function FormularioAcuerdo() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 max-w-5xl mx-auto">
-      <Card>
-        <CardHeader className="sm:px-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
-              Información del Acuerdo
-            </CardTitle>
-            <Link href="/dashboard/acuerdos" className="w-full sm:w-auto">
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver a la Plataforma
-              </Button>
-            </Link>
-          </div>
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <Card className="bg-gradient-to-br from-white via-slate-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-200/20 via-indigo-200/20 to-purple-200/20 dark:from-blue-800/10 dark:via-indigo-800/10 dark:to-purple-800/10 rounded-full blur-3xl -z-10"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-cyan-200/20 via-teal-200/20 to-emerald-200/20 dark:from-cyan-800/10 dark:via-teal-800/10 dark:to-emerald-800/10 rounded-full blur-2xl -z-10"></div>
+        
+        <CardHeader className="relative z-10 border-b border-slate-200/60 dark:border-slate-600/60 pb-4 sm:pb-6 bg-gradient-to-r from-white/50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-700/50 backdrop-blur-sm">
+          <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl text-slate-800 dark:text-slate-100">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent font-bold">
+              Crear Nuevo Acuerdo
+            </span>
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
+        <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 relative z-10">
           {/* Información de la sesión */}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="numeroSesion" className="text-sm sm:text-base">
+              <Label htmlFor="numeroSesion" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Número de Sesión <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <Input
                 id="numeroSesion"
                 value={formData.numeroSesion}
                 onChange={(e) => handleInputChange('numeroSesion', e.target.value)}
-                className={`w-full ${errors.numeroSesion ? 'field-error' : ''}`}
+                className={`w-full bg-white/70 dark:bg-slate-800/70 border-slate-300/60 dark:border-slate-600/60 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 ${errors.numeroSesion ? 'field-error border-red-500' : ''}`}
                 placeholder="Ej: SOE/2023/001"
               />
               {errors.numeroSesion && (
-                <p className="text-xs text-red-500 mt-1">{errors.numeroSesion}</p>
+                <p className="text-xs text-red-500 mt-1 font-medium">{errors.numeroSesion}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tipoSesion" className="text-sm sm:text-base">
+              <Label htmlFor="tipoSesion" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Tipo de Sesión <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <Select
                 value={formData.tipoSesion}
                 onValueChange={(value) => handleInputChange('tipoSesion', value)}
               >
-                <SelectTrigger className={`w-full ${errors.tipoSesion ? 'field-error' : ''}`}>
+                <SelectTrigger className={`w-full bg-white/70 dark:bg-slate-800/70 border-slate-300/60 dark:border-slate-600/60 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 ${errors.tipoSesion ? 'field-error border-red-500' : ''}`}>
                   <SelectValue placeholder="Selecciona el tipo" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-300/60 dark:border-slate-600/60">
                   {TIPOS_SESION.map((tipo) => (
-                    <SelectItem key={tipo} value={tipo}>
+                    <SelectItem key={tipo} value={tipo} className="hover:bg-blue-50/80 dark:hover:bg-slate-700/80">
                       {tipo}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               {errors.tipoSesion && (
-                <p className="text-xs text-red-500 mt-1">{errors.tipoSesion}</p>
+                <p className="text-xs text-red-500 mt-1 font-medium">{errors.tipoSesion}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fechaSesion" className="text-sm sm:text-base">
+              <Label htmlFor="fechaSesion" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Fecha de Sesión <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <Input
@@ -242,10 +241,10 @@ export function FormularioAcuerdo() {
                 type="date"
                 value={formData.fechaSesion}
                 onChange={(e) => handleInputChange('fechaSesion', e.target.value)}
-                className={`w-full ${errors.fechaSesion ? 'field-error' : ''}`}
+                className={`w-full bg-white/70 dark:bg-slate-800/70 border-slate-300/60 dark:border-slate-600/60 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 ${errors.fechaSesion ? 'field-error border-red-500' : ''}`}
               />
               {errors.fechaSesion && (
-                <p className="text-xs text-red-500 mt-1">{errors.fechaSesion}</p>
+                <p className="text-xs text-red-500 mt-1 font-medium">{errors.fechaSesion}</p>
               )}
             </div>
           </div>
@@ -253,7 +252,7 @@ export function FormularioAcuerdo() {
           {/* Información del acuerdo */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="temaAgenda" className="text-sm sm:text-base">
+              <Label htmlFor="temaAgenda" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Tema de Agenda <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <Input
@@ -261,15 +260,15 @@ export function FormularioAcuerdo() {
                 placeholder="Ej: Implementación de Sistema de Transparencia"
                 value={formData.temaAgenda}
                 onChange={(e) => handleInputChange('temaAgenda', e.target.value)}
-                className={`w-full ${errors.temaAgenda ? 'field-error' : ''}`}
+                className={`w-full bg-white/70 dark:bg-slate-800/70 border-slate-300/60 dark:border-slate-600/60 backdrop-blur-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 ${errors.temaAgenda ? 'field-error border-red-500' : ''}`}
               />
               {errors.temaAgenda && (
-                <p className="text-xs text-red-500 mt-1">{errors.temaAgenda}</p>
+                <p className="text-xs text-red-500 mt-1 font-medium">{errors.temaAgenda}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="descripcionAcuerdo" className="text-sm sm:text-base">
+              <Label htmlFor="descripcionAcuerdo" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Descripción del Acuerdo <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <textarea
@@ -278,12 +277,12 @@ export function FormularioAcuerdo() {
                 placeholder="Describe detalladamente el acuerdo tomado en la sesión..."
                 value={formData.descripcionAcuerdo}
                 onChange={(e) => handleInputChange('descripcionAcuerdo', e.target.value)}
-                className={`flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                className={`flex w-full rounded-md border bg-white/70 dark:bg-slate-800/70 border-slate-300/60 dark:border-slate-600/60 backdrop-blur-sm px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 focus-visible:border-blue-500/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 ${
                   errors.descripcionAcuerdo ? 'border-red-500' : ''
                 }`}
               />
               {errors.descripcionAcuerdo && (
-                <p className="text-xs text-red-500 mt-1">{errors.descripcionAcuerdo}</p>
+                <p className="text-xs text-red-500 mt-1 font-medium">{errors.descripcionAcuerdo}</p>
               )}
             </div>
           </div>
@@ -291,7 +290,7 @@ export function FormularioAcuerdo() {
           {/* Responsabilidad y seguimiento */}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="responsable" className="text-sm sm:text-base">
+              <Label htmlFor="responsable" className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">
                 Responsable <span className="text-red-500 font-bold text-lg ml-1">*</span>
               </Label>
               <Input
@@ -396,11 +395,13 @@ export function FormularioAcuerdo() {
 
           {/* Botones */}
           <div className="flex justify-end gap-4 pt-6 border-t">
-            <Link href="/dashboard/acuerdos">
-              <Button variant="outline" type="button">
-                Cancelar
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              type="button"
+              onClick={() => router.push('/dashboard/acuerdos')}
+            >
+              Cancelar
+            </Button>
             <Button type="submit" disabled={loading}>
               {loading ? (
                 <>

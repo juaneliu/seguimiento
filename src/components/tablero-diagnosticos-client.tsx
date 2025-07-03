@@ -525,26 +525,26 @@ export default function TableroDiagnosticosClient({
       </Card>
 
       {/* Filtros */}
-      <Card>
+      <Card className="bg-gradient-to-r from-slate-50 to-blue-50 border-slate-200 shadow-md">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Buscar</label>
+              <label className="block text-sm font-medium mb-2 text-slate-700">Buscar</label>
               <input
                 type="text"
                 placeholder="Buscar por municipio, actividad..."
                 value={searchTerm || ''}
                 onChange={(e) => setSearchTerm(e.target.value || '')}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 suppressHydrationWarning
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Municipio</label>
+              <label className="block text-sm font-medium mb-2 text-slate-700">Municipio</label>
               <select
                 value={selectedMunicipio || ''}
                 onChange={(e) => setSelectedMunicipio(e.target.value || '')}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 suppressHydrationWarning
               >
                 <option value="">Todos los municipios</option>
@@ -554,11 +554,11 @@ export default function TableroDiagnosticosClient({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Estado</label>
+              <label className="block text-sm font-medium mb-2 text-slate-700">Estado</label>
               <select
                 value={selectedEstado || ''}
                 onChange={(e) => setSelectedEstado(e.target.value || '')}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                 suppressHydrationWarning
               >
                 <option value="">Todos los estados</option>
@@ -579,38 +579,40 @@ export default function TableroDiagnosticosClient({
           }
 
           return (
-            <Card key={grupo.municipio} className="overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50">
+            <Card key={grupo.municipio} className="overflow-hidden shadow-lg border-slate-200 bg-white">
+              <CardHeader className="bg-gradient-to-r from-slate-100 via-blue-50 to-indigo-100 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <MunicipioIcon municipio={grupo.municipio} className="h-8 w-8" />
+                    <div className="p-2 bg-white rounded-lg shadow-sm border border-slate-200">
+                      <MunicipioIcon municipio={grupo.municipio} className="h-8 w-8" />
+                    </div>
                     <div>
-                      <CardTitle className="text-xl text-gray-800">
+                      <CardTitle className="text-xl text-slate-800 font-bold">
                         {grupo.municipio}
                       </CardTitle>
-                      <p className="text-sm text-gray-600">
-                        {grupo.diagnosticos.length} diagnósticos
+                      <p className="text-sm text-slate-600 font-medium">
+                        {grupo.diagnosticos.length} diagnósticos registrados
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="text-center">
+                    <div className="text-center bg-white p-3 rounded-lg shadow-sm border border-slate-200">
                       <div 
                         className="text-2xl font-bold"
                         style={{ color: getColorByPromedio(grupo.promedioEvaluacion) }}
                       >
                         {Math.round(grupo.promedioEvaluacion)}%
                       </div>
-                      <div className="text-xs text-gray-500">Promedio</div>
+                      <div className="text-xs text-slate-500 font-medium">Promedio</div>
                     </div>
-                    <Badge className="bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200">
+                    <Badge className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-800 border border-indigo-200 hover:from-indigo-200 hover:to-blue-200 shadow-sm font-medium px-3 py-1">
                       {grupo.accionesCompletadas}/{grupo.totalAcciones} acciones
                     </Badge>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="divide-y">
+              <CardContent className="p-0 bg-slate-50">
+                <div className="divide-y divide-slate-200">
                   {grupo.diagnosticos.map((diagnostico: DiagnosticoMunicipal) => {
                     const isExpanded = expandedRows.has(diagnostico.id)
                     const hasAcciones = diagnostico.acciones && diagnostico.acciones.length > 0
@@ -619,8 +621,10 @@ export default function TableroDiagnosticosClient({
                       <div key={diagnostico.id}>
                         {/* Fila principal del diagnóstico */}
                         <div 
-                          className={`p-6 hover:bg-gray-50 transition-colors cursor-pointer ${
-                            isExpanded ? 'bg-blue-50' : ''
+                          className={`p-6 bg-white border-l-4 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md ${
+                            isExpanded 
+                              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-l-blue-500 shadow-md' 
+                              : 'hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 border-l-gray-300 hover:border-l-blue-400'
                           }`}
                           onClick={() => toggleRowExpansion(diagnostico.id)}
                         >

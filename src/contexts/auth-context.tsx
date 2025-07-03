@@ -100,10 +100,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       
       setUser(guestUser)
+      
+      // Redirigir al dashboard
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard'
+      }
     } catch (error) {
       console.error('Logout error:', error)
       // Incluso si hay error en el servidor, limpiar estado local
       setUser(guestUser)
+      
+      // Redirigir al dashboard aunque haya error
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard'
+      }
     }
   }
 
