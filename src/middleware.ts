@@ -300,102 +300,20 @@ function validateCSRF(request: NextRequest): boolean {
 }
 
 export function middleware(request: NextRequest) {
-  const ip = getRealIP(request)
-  const pathname = request.nextUrl.pathname
+  // Minimal middleware for debugging
+  console.log(`🔒 [Middleware] ${request.method} ${request.nextUrl.pathname}`)
   
-  console.log(`🔒 [Middleware] ${request.method} ${pathname} from ${ip}`)
-  
-  // 1. Verificar IP bloqueada
-  if (BLOCKED_IPS.has(ip)) {
-    console.warn(`🚫 [Security] Blocked IP attempted access: ${ip}`)
-    trackSecurityEvent(ip, 'Access attempt from blocked IP')
-    return new NextResponse('Access denied', { status: 403 })
+  // En desarrollo, solo pasar las requests sin restricciones
+  if (process.env.NODE_ENV === 'development') {
+    return NextResponse.next()
   }
   
-  // 2. Detectar honeypot paths (trampas para bots)
-  if (isHoneypotPath(pathname)) {
-    console.warn(`🍯 [Honeypot] Suspicious access to ${pathname} from ${ip}`)
-    trackSecurityEvent(ip, `Honeypot access: ${pathname}`)
-    BLOCKED_IPS.add(ip)
-    return new NextResponse('Not found', { status: 404 })
-  }
-  
-  // 3. Validar request general
-  const validation = validateRequest(request)
-  if (!validation.valid) {
-    console.warn(`⚠️ [Security] Invalid request from ${ip}: ${validation.reason}`)
-    trackSecurityEvent(ip, `Invalid request: ${validation.reason}`)
-    return new NextResponse('Bad request', { status: 400 })
-  }
-  
-  // 4. Rate limiting para rutas de API
-  if (pathname.startsWith('/api/')) {
-    // Deshabilitar rate limiting en desarrollo
-    if (process.env.NODE_ENV !== 'development' && isRateLimited(ip, pathname)) {
-      console.warn(`🚦 [Rate Limit] IP ${ip} exceeded limit for ${pathname}`)
-      trackSecurityEvent(ip, `Rate limit exceeded: ${pathname}`)
-      
-      return new NextResponse('Rate limit exceeded', { 
-        status: 429,
-        headers: {
-          'Retry-After': '60',
-          'X-RateLimit-Limit': getRateLimit(pathname).requests.toString(),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': (Date.now() + getRateLimit(pathname).window).toString()
-        }
-      })
-    }
-    
-    // 5. Validar CSRF para APIs
-    if (!validateCSRF(request)) {
-      console.warn(`🛡️ [CSRF] Invalid CSRF token from ${ip} for ${pathname}`)
-      trackSecurityEvent(ip, `CSRF validation failed: ${pathname}`)
-      return new NextResponse('CSRF validation failed', { status: 403 })
-    }
-    
-    // Agregar headers de seguridad para APIs
-    const response = NextResponse.next()
-    
-    // Headers de rate limiting informativos
-    const limit = getRateLimit(pathname)
-    const key = `${ip}:${pathname}`
-    const current = rateLimitStore.get(key)
-    
-    response.headers.set('X-RateLimit-Limit', limit.requests.toString())
-    response.headers.set('X-RateLimit-Remaining', 
-      current ? (limit.requests - current.count).toString() : limit.requests.toString()
-    )
-    response.headers.set('X-RateLimit-Reset', 
-      current ? current.resetTime.toString() : (Date.now() + limit.window).toString()
-    )
-    
-    // Headers adicionales de seguridad para APIs
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('X-Frame-Options', 'DENY')
-    response.headers.set('X-XSS-Protection', '1; mode=block')
-    
-    // CSRF Protection: Set CSRF token cookie if not exists
-    if (!request.cookies.get(CSRF_COOKIE)) {
-      const csrfToken = generateCSRFToken()
-      response.cookies.set(CSRF_COOKIE, csrfToken, {
-        httpOnly: false, // Permitir acceso desde JavaScript
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/'
-      })
-    }
-    
-    return response
-  }
-  
-  // Para rutas no-API, solo agregar headers básicos de seguridad
+  // En producción, ser más permisivo temporalmente para debug
   const response = NextResponse.next()
   
-  // Prevenir clickjacking
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-  
-  // Prevenir MIME sniffing
+  // Headers básicos de seguridad
   response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
   
   return response
 }

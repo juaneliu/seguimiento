@@ -28,15 +28,28 @@ export default function LoginPage() {
     setMessage(null)
 
     try {
+      console.log('🔐 Attempting login...', { email })
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include' // Importante para las cookies
       })
 
-      const data = await response.json()
+      console.log('🔐 Login response status:', response.status)
+      console.log('🔐 Login response headers:', Object.fromEntries(response.headers.entries()))
+
+      let data
+      try {
+        data = await response.json()
+        console.log('🔐 Login response data:', data)
+      } catch (parseError) {
+        console.error('🔐 Failed to parse response as JSON:', parseError)
+        throw new Error('Respuesta inválida del servidor')
+      }
 
       if (response.ok && data.success) {
         setMessage({ type: 'success', text: 'Acceso autorizado' })
@@ -47,11 +60,21 @@ export default function LoginPage() {
           window.location.href = '/dashboard'
         }, 1200)
       } else {
-        setMessage({ type: 'error', text: data.error || 'Error de autenticación' })
+        const errorMsg = data.error || `Error de autenticación (Status: ${response.status})`
+        console.error('🔐 Login failed:', errorMsg)
+        setMessage({ type: 'error', text: errorMsg })
       }
     } catch (error) {
-      console.error('Error en login:', error)
-      setMessage({ type: 'error', text: 'Error de conexión' })
+      console.error('🔐 Error en login:', error)
+      let errorMessage = 'Error de conexión'
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'No se pudo conectar al servidor'
+      } else if (error instanceof Error) {
+        errorMessage = error.message
+      }
+      
+      setMessage({ type: 'error', text: errorMessage })
     } finally {
       setIsLoading(false)
     }

@@ -261,8 +261,7 @@ export class EntesService {
           sistema6: ente.sistema6,
           entidad: ente.entidad,
           municipio: ente.municipio
-        })),
-        skipDuplicates: true
+        }))
       })
     } catch (error) {
       console.error('Error importing entes:', error)

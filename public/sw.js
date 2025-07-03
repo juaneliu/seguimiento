@@ -23,6 +23,13 @@ const API_ROUTES = [
   '/api/diagnosticos'
 ]
 
+// Rutas de API que NO deben ser cacheadas
+const NO_CACHE_API_ROUTES = [
+  '/api/auth/login',
+  '/api/auth/logout',
+  '/api/auth/register'
+]
+
 // Tiempo de vida del cache en milisegundos
 const CACHE_DURATION = {
   STATIC: 24 * 60 * 60 * 1000, // 24 horas
@@ -86,6 +93,12 @@ self.addEventListener('fetch', (event) => {
 
   // Estrategia para APIs
   if (isApiRoute(request)) {
+    // No cachear rutas de autenticación
+    if (isNoCacheApiRoute(request)) {
+      event.respondWith(fetch(request))
+      return
+    }
+    
     // Solo cachear métodos GET para APIs
     if (request.method === 'GET') {
       event.respondWith(staleWhileRevalidate(request, API_CACHE))
@@ -130,21 +143,23 @@ async function cacheFirst(request, cacheName) {
       const cache = await caches.open(cacheName)
       const responseToCache = networkResponse.clone()
       
-      // Añadir timestamp al cache
+      // Crear una nueva respuesta con headers modificados
+      const responseBody = await responseToCache.arrayBuffer()
       const headers = new Headers(responseToCache.headers)
       headers.set('sw-cache-time', Date.now().toString())
       
-      const cachedResponse = new Response(responseToCache.body, {
+      const modifiedResponse = new Response(responseBody, {
         status: responseToCache.status,
         statusText: responseToCache.statusText,
         headers
       })
       
-      cache.put(request, cachedResponse)
+      cache.put(request, modifiedResponse)
     }
     
     return networkResponse
   } catch (error) {
+    console.error('[SW] Cache first error:', error)
     return cachedResponse || new Response('Recurso no disponible', { status: 404 })
   }
 }
@@ -158,20 +173,22 @@ async function networkFirst(request, cacheName) {
       const cache = await caches.open(cacheName)
       const responseToCache = networkResponse.clone()
       
+      const responseBody = await responseToCache.arrayBuffer()
       const headers = new Headers(responseToCache.headers)
       headers.set('sw-cache-time', Date.now().toString())
       
-      const cachedResponse = new Response(responseToCache.body, {
+      const modifiedResponse = new Response(responseBody, {
         status: responseToCache.status,
         statusText: responseToCache.statusText,
         headers
       })
       
-      cache.put(request, cachedResponse)
+      cache.put(request, modifiedResponse)
     }
     
     return networkResponse
   } catch (error) {
+    console.error('[SW] Network first error:', error)
     const cachedResponse = await caches.match(request)
     return cachedResponse || new Response('Página no disponible sin conexión', { 
       status: 404,
@@ -184,24 +201,28 @@ async function networkFirst(request, cacheName) {
 async function staleWhileRevalidate(request, cacheName) {
   const cachedResponse = await caches.match(request)
   
-  const fetchPromise = fetch(request).then(networkResponse => {
+  const fetchPromise = fetch(request).then(async networkResponse => {
     if (networkResponse.ok && request.method === 'GET') {
-      const cache = caches.open(cacheName)
+      const cache = await caches.open(cacheName)
       const responseToCache = networkResponse.clone()
       
+      const responseBody = await responseToCache.arrayBuffer()
       const headers = new Headers(responseToCache.headers)
       headers.set('sw-cache-time', Date.now().toString())
       
-      const cachedResponse = new Response(responseToCache.body, {
+      const modifiedResponse = new Response(responseBody, {
         status: responseToCache.status,
         statusText: responseToCache.statusText,
         headers
       })
       
-      cache.then(c => c.put(request, cachedResponse))
+      cache.put(request, modifiedResponse)
     }
     return networkResponse
-  }).catch(() => null)
+  }).catch(error => {
+    console.error('[SW] Stale while revalidate error:', error)
+    return null
+  })
   
   // Devolver cache inmediatamente si existe, sino esperar network
   if (cachedResponse) {
@@ -230,6 +251,11 @@ function isApiRoute(request) {
   const url = new URL(request.url)
   return url.pathname.startsWith('/api/') && 
          API_ROUTES.some(route => url.pathname.startsWith(route))
+}
+
+function isNoCacheApiRoute(request) {
+  const url = new URL(request.url)
+  return NO_CACHE_API_ROUTES.some(route => url.pathname.startsWith(route))
 }
 
 // Limpiar cache periódicamente
