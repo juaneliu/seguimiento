@@ -13,7 +13,7 @@ export type DirectorioOICData = {
   entidad: {
     nombre: string
   }
-  entesPublicosIds: number[] // IDs de los entes públicos asociados
+  directorio_oic_entesIds: number[] // IDs de los entes públicos asociados
   createdAt?: Date
   updatedAt?: Date
 }
@@ -29,7 +29,7 @@ export type DirectorioOICWithEntes = {
   entidad: {
     nombre: string
   }
-  entesPublicos: Array<{
+  directorio_oic_entes: Array<{
     id: number
     nombre: string
     ambitoGobierno: string
@@ -43,11 +43,11 @@ export class DirectorioOICService {
   
   static async getAll(): Promise<DirectorioOICWithEntes[]> {
     try {
-      const directorios = await prisma.directorioOIC.findMany({
+      const directorios = await prisma.directorio_oic.findMany({
         include: {
-          entesPublicos: {
+          directorio_oic_entes: {
             include: {
-              entePublico: {
+              entes_publicos: {
                 select: {
                   id: true,
                   nombre: true,
@@ -72,7 +72,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        entesPublicos: directorio.entesPublicos.map((ep: any) => ep.entePublico),
+        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }))
@@ -84,12 +84,12 @@ export class DirectorioOICService {
 
   static async getById(id: number): Promise<DirectorioOICWithEntes | null> {
     try {
-      const directorio = await prisma.directorioOIC.findUnique({
+      const directorio = await prisma.directorio_oic.findUnique({
         where: { id },
         include: {
-          entesPublicos: {
+          directorio_oic_entes: {
             include: {
-              entePublico: {
+              entes_publicos: {
                 select: {
                   id: true,
                   nombre: true,
@@ -113,7 +113,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        entesPublicos: directorio.entesPublicos.map((ep: any) => ep.entePublico),
+        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }
@@ -125,21 +125,22 @@ export class DirectorioOICService {
 
   static async create(data: Omit<DirectorioOICData, 'id' | 'createdAt' | 'updatedAt'>): Promise<DirectorioOICWithEntes> {
     try {
-      const { entesPublicosIds, ...directorioData } = data
+      const { directorio_oic_entesIds, ...directorioData } = data
 
-      const directorio = await prisma.directorioOIC.create({
+      const directorio = await prisma.directorio_oic.create({
         data: {
           ...directorioData,
-          entesPublicos: {
-            create: entesPublicosIds.map((enteId: number) => ({
+          updatedAt: new Date(),
+          directorio_oic_entes: {
+            create: directorio_oic_entesIds.map((enteId: number) => ({
               entePublicoId: enteId
             }))
           }
         },
         include: {
-          entesPublicos: {
+          directorio_oic_entes: {
             include: {
-              entePublico: {
+              entes_publicos: {
                 select: {
                   id: true,
                   nombre: true,
@@ -161,7 +162,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        entesPublicos: directorio.entesPublicos.map((ep: any) => ep.entePublico),
+        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }
@@ -173,19 +174,19 @@ export class DirectorioOICService {
 
   static async update(id: number, data: Partial<Omit<DirectorioOICData, 'id' | 'createdAt' | 'updatedAt'>>): Promise<DirectorioOICWithEntes> {
     try {
-      const { entesPublicosIds, ...directorioData } = data
+      const { directorio_oic_entesIds, ...directorioData } = data
 
       // Si se proporcionan nuevos entes públicos, actualizar las relaciones
-      if (entesPublicosIds !== undefined) {
+      if (directorio_oic_entesIds !== undefined) {
         // Eliminar relaciones existentes
-        await prisma.directorioOICEnte.deleteMany({
+        await prisma.directorio_oic_entes.deleteMany({
           where: { directorioOICId: id }
         })
         
         // Crear nuevas relaciones
-        if (entesPublicosIds.length > 0) {
-          await prisma.directorioOICEnte.createMany({
-            data: entesPublicosIds.map((enteId: number) => ({
+        if (directorio_oic_entesIds.length > 0) {
+          await prisma.directorio_oic_entes.createMany({
+            data: directorio_oic_entesIds.map((enteId: number) => ({
               directorioOICId: id,
               entePublicoId: enteId
             }))
@@ -193,13 +194,13 @@ export class DirectorioOICService {
         }
       }
 
-      const directorio = await prisma.directorioOIC.update({
+      const directorio = await prisma.directorio_oic.update({
         where: { id },
         data: directorioData,
         include: {
-          entesPublicos: {
+          directorio_oic_entes: {
             include: {
-              entePublico: {
+              entes_publicos: {
                 select: {
                   id: true,
                   nombre: true,
@@ -221,7 +222,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        entesPublicos: directorio.entesPublicos.map((ep: any) => ep.entePublico),
+        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }
@@ -233,7 +234,7 @@ export class DirectorioOICService {
 
   static async delete(id: number): Promise<void> {
     try {
-      await prisma.directorioOIC.delete({
+      await prisma.directorio_oic.delete({
         where: { id }
       })
     } catch (error) {
@@ -244,14 +245,14 @@ export class DirectorioOICService {
 
   static async getStatistics() {
     try {
-      const total = await prisma.directorioOIC.count()
+      const total = await prisma.directorio_oic.count()
       
-      const porOIC = await prisma.directorioOIC.groupBy({
+      const porOIC = await prisma.directorio_oic.groupBy({
         by: ['oicNombre'],
         _count: true
       })
 
-      const porPuesto = await prisma.directorioOIC.groupBy({
+      const porPuesto = await prisma.directorio_oic.groupBy({
         by: ['puesto'],
         _count: true
       })

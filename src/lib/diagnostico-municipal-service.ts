@@ -24,7 +24,7 @@ export class DiagnosticoMunicipalService {
   
   // Obtener todos los diagnósticos
   static async getAll() {
-    return await prisma.diagnosticoMunicipal.findMany({
+    return await prisma.diagnosticos_municipales.findMany({
       orderBy: {
         fechaCreacion: 'desc'
       }
@@ -33,7 +33,7 @@ export class DiagnosticoMunicipalService {
 
   // Obtener diagnóstico por ID
   static async getById(id: number) {
-    const diagnostico = await prisma.diagnosticoMunicipal.findUnique({
+    const diagnostico = await prisma.diagnosticos_municipales.findUnique({
       where: { id }
     })
     
@@ -46,7 +46,7 @@ export class DiagnosticoMunicipalService {
 
   // Crear nuevo diagnóstico
   static async create(data: DiagnosticoMunicipalData) {
-    return await prisma.diagnosticoMunicipal.create({
+    return await prisma.diagnosticos_municipales.create({
       data: {
         nombreActividad: data.nombreActividad,
         municipio: data.municipio,
@@ -58,14 +58,16 @@ export class DiagnosticoMunicipalService {
         observaciones: data.observaciones || null,
         acciones: data.acciones || [],
         estado: data.estado || 'En Proceso',
-        creadoPor: data.creadoPor || null
+        creadoPor: data.creadoPor || null,
+        fechaCreacion: new Date(),
+        fechaActualizacion: new Date()
       }
     })
   }
 
   // Actualizar diagnóstico
   static async update(id: number, data: Partial<DiagnosticoMunicipalData>) {
-    return await prisma.diagnosticoMunicipal.update({
+    return await prisma.diagnosticos_municipales.update({
       where: { id },
       data: {
         ...(data.nombreActividad && { nombreActividad: data.nombreActividad }),
@@ -85,7 +87,7 @@ export class DiagnosticoMunicipalService {
 
   // Eliminar diagnóstico
   static async delete(id: number) {
-    return await prisma.diagnosticoMunicipal.delete({
+    return await prisma.diagnosticos_municipales.delete({
       where: { id }
     })
   }
@@ -105,7 +107,7 @@ export class DiagnosticoMunicipalService {
 
   // Obtener diagnósticos por municipio
   static async getByMunicipio(municipio: string) {
-    return await prisma.diagnosticoMunicipal.findMany({
+    return await prisma.diagnosticos_municipales.findMany({
       where: { municipio },
       orderBy: {
         fechaCreacion: 'desc'
@@ -115,7 +117,7 @@ export class DiagnosticoMunicipalService {
 
   // Obtener diagnósticos por estado
   static async getByEstado(estado: string) {
-    return await prisma.diagnosticoMunicipal.findMany({
+    return await prisma.diagnosticos_municipales.findMany({
       where: { estado },
       orderBy: {
         fechaCreacion: 'desc'
@@ -125,6 +127,6 @@ export class DiagnosticoMunicipalService {
 
   // Eliminar todos los diagnósticos (usar con cuidado)
   static async deleteAll() {
-    return await prisma.diagnosticoMunicipal.deleteMany({})
+    return await prisma.diagnosticos_municipales.deleteMany({})
   }
 }

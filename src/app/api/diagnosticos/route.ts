@@ -11,7 +11,7 @@ function calcularEstadoAutomatico(evaluacion: number): string {
 // GET - Obtener todos los diagnósticos
 export async function GET() {
   try {
-    const diagnosticos = await prisma.diagnosticoMunicipal.findMany({
+    const diagnosticos = await prisma.diagnosticos_municipales.findMany({
       orderBy: {
         fechaCreacion: 'desc'
       }
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       )
     }
     const evaluacion = parseFloat(data.evaluacion)
-    const diagnostico = await prisma.diagnosticoMunicipal.create({
+    const diagnostico = await prisma.diagnosticos_municipales.create({
       data: {
         nombreActividad: data.nombreActividad,
         municipio: data.municipio,
@@ -59,7 +59,9 @@ export async function POST(request: Request) {
         observaciones: data.observaciones || null,
         acciones: data.acciones || [],
         estado: calcularEstadoAutomatico(evaluacion), // Estado automático basado en evaluación
-        creadoPor: data.creadoPor || null
+        creadoPor: data.creadoPor || null,
+        fechaCreacion: new Date(),
+        fechaActualizacion: new Date()
       }
     })
 
@@ -88,7 +90,7 @@ export async function DELETE(request: Request) {
       )
     }
 
-    await prisma.diagnosticoMunicipal.delete({
+    await prisma.diagnosticos_municipales.delete({
       where: { id: parseInt(id) }
     })
 

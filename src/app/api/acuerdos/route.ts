@@ -4,13 +4,9 @@ import { prisma } from '@/lib/prisma-service'
 // GET - Obtener todos los acuerdos
 export async function GET() {
   try {
-    const acuerdos = await prisma.acuerdoSeguimiento.findMany({
+    const acuerdos = await prisma.acuerdos_seguimiento.findMany({
       include: {
-        seguimientos: {
-          orderBy: {
-            fechaSeguimiento: 'desc'
-          }
-        }
+        seguimientos: true
       },
       orderBy: {
         fechaCreacion: 'desc'
@@ -32,7 +28,7 @@ export async function POST(request: Request) {
   try {
     const data = await request.json()
     
-    const acuerdo = await prisma.acuerdoSeguimiento.create({
+    const acuerdo = await prisma.acuerdos_seguimiento.create({
       data: {
         numeroSesion: data.numeroSesion,
         tipoSesion: data.tipoSesion,
@@ -45,6 +41,7 @@ export async function POST(request: Request) {
         prioridad: data.prioridad,
         estado: data.estado || 'Pendiente',
         observaciones: data.observaciones || null,
+        fechaActualizacion: new Date(),
         creadoPor: data.creadoPor || null
       }
     })
@@ -59,26 +56,39 @@ export async function POST(request: Request) {
   }
 }
 
-// DELETE - Eliminar acuerdo
+// DELETE - Eliminar múltiples acuerdos
 export async function DELETE(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-
-    if (!id) {
+    const { ids } = await request.json()
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
       return NextResponse.json(
-        { error: 'ID requerido' },
+        { error: 'Se requiere un array de IDs válidos' },
         { status: 400 }
       )
     }
 
-    await prisma.acuerdoSeguimiento.delete({
-      where: { id: parseInt(id) }
+    // Eliminar seguimientos primero (por la relación)
+    await prisma.seguimientos.deleteMany({
+      where: {
+        acuerdoId: {
+          in: ids.map(id => parseInt(id))
+        }
+      }
     })
 
-    return NextResponse.json({ success: true })
+    // Luego eliminar los acuerdos
+    await prisma.acuerdos_seguimiento.deleteMany({
+      where: {
+        id: {
+          in: ids.map(id => parseInt(id))
+        }
+      }
+    })
+
+    return NextResponse.json({ message: 'Acuerdos eliminados exitosamente' })
   } catch (error) {
-    console.error('Error eliminando acuerdo:', error)
+    console.error('Error eliminando acuerdos:', error)
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

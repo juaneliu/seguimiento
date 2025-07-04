@@ -39,7 +39,7 @@ export class AuthService {
     const { email, nombre, apellido, password, rol } = userData
 
     // Verificar si el usuario ya existe
-    const existingUser = await prisma.usuario.findUnique({
+    const existingUser = await prisma.usuarios.findUnique({
       where: { email }
     })
 
@@ -53,13 +53,16 @@ export class AuthService {
       hashedPassword = await bcrypt.hash(password, 12)
     }
 
-    const user = await prisma.usuario.create({
+    const user = await prisma.usuarios.create({
       data: {
         email,
         nombre,
         apellido,
         password: hashedPassword,
-        rol
+        rol,
+        activo: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     })
 
@@ -71,7 +74,7 @@ export class AuthService {
     const { email, password } = credentials
 
     // Buscar usuario por email
-    const user = await prisma.usuario.findUnique({
+    const user = await prisma.usuarios.findUnique({
       where: { email }
     })
 
@@ -101,7 +104,7 @@ export class AuthService {
     }
 
     // Actualizar último acceso
-    await prisma.usuario.update({
+    await prisma.usuarios.update({
       where: { id: user.id },
       data: { ultimoAcceso: new Date() }
     })
@@ -138,7 +141,7 @@ export class AuthService {
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any
 
-      const user = await prisma.usuario.findUnique({
+      const user = await prisma.usuarios.findUnique({
         where: { id: decoded.userId }
       })
 
@@ -164,7 +167,7 @@ export class AuthService {
 
   // Obtener todos los usuarios
   static async getUsers(): Promise<Usuario[]> {
-    const users = await prisma.usuario.findMany({
+    const users = await prisma.usuarios.findMany({
       orderBy: { createdAt: 'desc' }
     })
 
@@ -183,7 +186,7 @@ export class AuthService {
 
   // Obtener usuario por ID
   static async getUserById(id: number): Promise<Usuario | null> {
-    const user = await prisma.usuario.findUnique({
+    const user = await prisma.usuarios.findUnique({
       where: { id }
     })
 
@@ -211,7 +214,7 @@ export class AuthService {
       updateData.password = await bcrypt.hash(data.password, 12)
     }
 
-    const user = await prisma.usuario.update({
+    const user = await prisma.usuarios.update({
       where: { id },
       data: updateData
     })
@@ -231,14 +234,14 @@ export class AuthService {
 
   // Eliminar usuario
   static async deleteUser(id: number): Promise<void> {
-    await prisma.usuario.delete({
+    await prisma.usuarios.delete({
       where: { id }
     })
   }
 
   // Cambiar estado activo/inactivo
   static async toggleUserStatus(id: number): Promise<Usuario> {
-    const user = await prisma.usuario.findUnique({
+    const user = await prisma.usuarios.findUnique({
       where: { id }
     })
 
@@ -246,7 +249,7 @@ export class AuthService {
       throw new Error('Usuario no encontrado')
     }
 
-    const updatedUser = await prisma.usuario.update({
+    const updatedUser = await prisma.usuarios.update({
       where: { id },
       data: { activo: !user.activo }
     })

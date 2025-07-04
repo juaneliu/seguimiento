@@ -80,7 +80,7 @@ export class EntesService {
 
   static async getAll(): Promise<EntePublico[]> {
     try {
-      const entes = await prisma.entePublico.findMany({
+      const entes = await prisma.entes_publicos.findMany({
         orderBy: { nombre: 'asc' }
       })
 
@@ -109,7 +109,7 @@ export class EntesService {
 
   static async getById(id: number): Promise<EntePublico | null> {
     try {
-      const ente = await prisma.entePublico.findUnique({
+      const ente = await prisma.entes_publicos.findUnique({
         where: { id }
       })
 
@@ -144,7 +144,7 @@ export class EntesService {
     }
 
     try {
-      const created = await prisma.entePublico.create({
+      const created = await prisma.entes_publicos.create({
         data: {
           nombre: ente.nombre,
           ambitoGobierno: ente.ambitoGobierno,
@@ -156,7 +156,9 @@ export class EntesService {
           sistema3: ente.sistema3,
           sistema6: ente.sistema6,
           entidad: ente.entidad,
-          municipio: ente.municipio
+          municipio: ente.municipio,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }
       })
 
@@ -188,7 +190,7 @@ export class EntesService {
     }
 
     try {
-      const updated = await prisma.entePublico.update({
+      const updated = await prisma.entes_publicos.update({
         where: { id },
         data: {
           ...(ente.nombre && { nombre: ente.nombre }),
@@ -233,7 +235,7 @@ export class EntesService {
     }
 
     try {
-      await prisma.entePublico.delete({
+      await prisma.entes_publicos.delete({
         where: { id }
       })
     } catch (error) {
@@ -248,7 +250,7 @@ export class EntesService {
     }
 
     try {
-      await prisma.entePublico.createMany({
+      await prisma.entes_publicos.createMany({
         data: entes.map(ente => ({
           nombre: ente.nombre,
           ambitoGobierno: ente.ambitoGobierno,
@@ -260,7 +262,9 @@ export class EntesService {
           sistema3: ente.sistema3,
           sistema6: ente.sistema6,
           entidad: ente.entidad,
-          municipio: ente.municipio
+          municipio: ente.municipio,
+          createdAt: new Date(),
+          updatedAt: new Date()
         }))
       })
     } catch (error) {
@@ -315,7 +319,7 @@ export class EntesService {
 
   static async getEntesConOIC(): Promise<EntePublico[]> {
     try {
-      const entes = await prisma.entePublico.findMany({
+      const entes = await prisma.entes_publicos.findMany({
         where: { controlOIC: true },
         orderBy: { nombre: 'asc' }
       })

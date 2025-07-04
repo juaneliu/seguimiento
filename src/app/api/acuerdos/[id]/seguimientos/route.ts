@@ -18,7 +18,7 @@ export async function GET(
     }
 
     // Verificar que el acuerdo existe
-    const acuerdo = await prisma.acuerdoSeguimiento.findUnique({
+    const acuerdo = await prisma.acuerdos_seguimiento.findUnique({
       where: { id: acuerdoId }
     })
 
@@ -30,9 +30,10 @@ export async function GET(
     }
 
     // Obtener los seguimientos del acuerdo
-    const seguimientos = await prisma.$queryRaw`
-      SELECT * FROM seguimientos WHERE "acuerdoId" = ${acuerdoId} ORDER BY "fechaSeguimiento" DESC
-    `
+    const seguimientos = await prisma.seguimientos.findMany({
+      where: { acuerdoId: acuerdoId },
+      orderBy: { fechaSeguimiento: 'desc' }
+    })
 
     return NextResponse.json(seguimientos)
   } catch (error) {
@@ -72,7 +73,7 @@ export async function POST(
     }
 
     // Verificar que el acuerdo existe
-    const acuerdo = await prisma.acuerdoSeguimiento.findUnique({
+    const acuerdo = await prisma.acuerdos_seguimiento.findUnique({
       where: { id: acuerdoId }
     })
 
@@ -83,12 +84,18 @@ export async function POST(
       )
     }
 
-    // Crear el seguimiento usando query cruda
-    const nuevoSeguimiento = await prisma.$queryRaw`
-      INSERT INTO seguimientos ("acuerdoId", seguimiento, accion, "fechaSeguimiento", "creadoPor", "fechaCreacion", "fechaActualizacion")
-      VALUES (${acuerdoId}, ${seguimiento}, ${accion}, ${fechaSeguimiento ? new Date(fechaSeguimiento) : new Date()}, ${creadoPor}, NOW(), NOW())
-      RETURNING *
-    `
+    // Crear el seguimiento
+    const nuevoSeguimiento = await prisma.seguimientos.create({
+      data: {
+        acuerdoId: acuerdoId,
+        seguimiento: seguimiento,
+        accion: accion,
+        fechaSeguimiento: fechaSeguimiento ? new Date(fechaSeguimiento) : new Date(),
+        creadoPor: creadoPor,
+        fechaCreacion: new Date(),
+        fechaActualizacion: new Date()
+      }
+    })
 
     return NextResponse.json(nuevoSeguimiento, { status: 201 })
   } catch (error) {

@@ -15,7 +15,7 @@ export async function GET(
 ) {
   const { id } = await params
   try {
-    const diagnostico = await prisma.diagnosticoMunicipal.findUnique({
+    const diagnostico = await prisma.diagnosticos_municipales.findUnique({
       where: { id: parseInt(id) }
     })
 
@@ -48,7 +48,7 @@ export async function PUT(
     console.log('[PUT] Datos recibidos:', JSON.stringify(data, null, 2))
     
     // Verificar que el diagnóstico existe
-    const diagnosticoExistente = await prisma.diagnosticoMunicipal.findUnique({
+    const diagnosticoExistente = await prisma.diagnosticos_municipales.findUnique({
       where: { id: parseInt(id) }
     })
 
@@ -83,7 +83,7 @@ export async function PUT(
     
     console.log('[PUT] Datos para actualización:', updateData)
     
-    const diagnostico = await prisma.diagnosticoMunicipal.update({
+    const diagnostico = await prisma.diagnosticos_municipales.update({
       where: { id: parseInt(id) },
       data: updateData
     })
@@ -126,7 +126,7 @@ export async function PATCH(
   try {
     const data = await request.json()
     
-    const diagnostico = await prisma.diagnosticoMunicipal.update({
+    const diagnostico = await prisma.diagnosticos_municipales.update({
       where: { id: parseInt(id) },
       data: {
         ...data,
@@ -151,7 +151,7 @@ export async function DELETE(
 ) {
   const { id } = await params
   try {
-    await prisma.diagnosticoMunicipal.delete({
+    await prisma.diagnosticos_municipales.delete({
       where: { id: parseInt(id) }
     })
 

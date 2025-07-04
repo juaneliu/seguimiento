@@ -1,15 +1,22 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma-service'
 
-// GET - Obtener acuerdo por ID
+// GET - Obtener acuerdo específico
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
   try {
-    const acuerdo = await prisma.acuerdoSeguimiento.findUnique({
-      where: { id: parseInt(id) }
+    const acuerdo = await prisma.acuerdos_seguimiento.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        seguimientos: {
+          orderBy: {
+            fechaSeguimiento: 'desc'
+          }
+        }
+      }
     })
 
     if (!acuerdo) {
@@ -38,7 +45,7 @@ export async function PUT(
   try {
     const data = await request.json()
     
-    const acuerdo = await prisma.acuerdoSeguimiento.update({
+    const acuerdo = await prisma.acuerdos_seguimiento.update({
       where: { id: parseInt(id) },
       data: {
         numeroSesion: data.numeroSesion,
@@ -51,8 +58,9 @@ export async function PUT(
         fechaCompromiso: new Date(data.fechaCompromiso),
         prioridad: data.prioridad,
         estado: data.estado,
-        observaciones: data.observaciones || null,
-        fechaActualizacion: new Date()
+        observaciones: data.observaciones,
+        fechaActualizacion: new Date(),
+        creadoPor: data.creadoPor
       }
     })
 
@@ -73,11 +81,17 @@ export async function DELETE(
 ) {
   const { id } = await params
   try {
-    await prisma.acuerdoSeguimiento.delete({
+    // Eliminar seguimientos primero
+    await prisma.seguimientos.deleteMany({
+      where: { acuerdoId: parseInt(id) }
+    })
+
+    // Luego eliminar el acuerdo
+    await prisma.acuerdos_seguimiento.delete({
       where: { id: parseInt(id) }
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ message: 'Acuerdo eliminado exitosamente' })
   } catch (error) {
     console.error('Error eliminando acuerdo:', error)
     return NextResponse.json(

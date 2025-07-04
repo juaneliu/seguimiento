@@ -5,23 +5,33 @@ import { AlertCircle, Database, Settings, CheckCircle2 } from "lucide-react"
 import { useEffect, useState } from "react"
 
 export function DatabaseStatus() {
-  const [isConfigured, setIsConfigured] = useState(true)
+  const [isConfigured, setIsConfigured] = useState(false) // Cambio: iniciar en false
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
     // Verificar si la base de datos está configurada
     const checkDatabase = async () => {
       try {
-        const response = await fetch('/api/database-status')
-        const { isConfigured } = await response.json()
-        setIsConfigured(isConfigured)
+        const response = await fetch('/api/database-status', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setIsConfigured(data.isConfigured === true)
+        } else {
+          setIsConfigured(false)
+        }
       } catch (error) {
-        // Si no hay API de estado, usar verificación básica de env
-        const configured = process.env.DATABASE_URL !== undefined && 
-                         !process.env.DATABASE_URL?.includes('usuario:password')
-        setIsConfigured(configured)
+        console.error('Error verificando estado de la base de datos:', error)
+        setIsConfigured(false)
+      } finally {
+        setIsChecking(false)
       }
-      setIsChecking(false)
     }
 
     checkDatabase()

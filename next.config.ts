@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Configuración para acceso desde red local
-  allowedDevOrigins: ['192.168.1.131', '192.168.1.132'],
+  allowedDevOrigins: ['192.168.1.131', '192.168.1.132', 'seguimiento.saem.gob.mx'],
   
   // Optimizaciones de rendimiento avanzadas
   experimental: {

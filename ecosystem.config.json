@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "tablero-estadistico",
+    "name": "seguimiento-saem",
     "script": "npm",
     "args": "start",
     "instances": 1,
@@ -13,12 +13,13 @@
       "NODE_ENV": "production",
       "PORT": 3000,
       "NEXTAUTH_URL": "https://seguimiento.saem.gob.mx",
-      "NEXTAUTH_SECRET": "super_secure_secret_for_production_2025_tablero_estadistico",
-      "DATABASE_URL": "postgresql://tablero_user:tablero_secure_pass_2025@localhost:5432/tablero_estadistico?schema=public"
+      "NEXTAUTH_SECRET": "nextauth_secret_super_seguro_para_produccion_2025_saem",
+      "DATABASE_URL": "postgresql://admin:SeguimientoSAEM2025@localhost:5432/tablero_estadistico_prod",
+      "JWT_SECRET": "jwt_secret_super_seguro_para_produccion_2025_saem_seguimiento"
     },
     "log_date_format": "YYYY-MM-DD HH:mm Z",
-    "error_file": "/var/log/pm2/tablero-error.log",
-    "out_file": "/var/log/pm2/tablero-out.log",
+    "error_file": "/var/log/pm2/seguimiento-error.log",
+    "out_file": "/var/log/pm2/seguimiento-out.log",
     "time": true,
     "autorestart": true,
     "watch": false,
