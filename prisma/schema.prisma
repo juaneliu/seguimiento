@@ -98,32 +98,31 @@ model seguimientos {
 }
 
 model usuarios {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
   nombre       String
   apellido     String
   password     String?
-  rol          RolUsuario @default(INVITADO)
-  activo       Boolean    @default(true)
+  rol          RolUsuario  @default(INVITADO)
+  activo       Boolean     @default(true)
   ultimoAcceso DateTime?
-  createdAt    DateTime   @default(now())
+  createdAt    DateTime    @default(now())
   updatedAt    DateTime
   auditLogs    AuditLogs[]
 }
 
 model AuditLogs {
-  id              Int      @id @default(autoincrement())
-  usuarioId       Int      @map("usuario_id")
-  accion          String   @map("accion")
-  tabla           String   @map("tabla")
-  registroId      Int?     @map("registro_id")
-  valoresAnteriores Json?  @map("valores_anteriores")
-  valoresNuevos   Json?    @map("valores_nuevos")
-  direccionIP     String?  @map("direccion_ip")
-  fechaCreacion   DateTime @default(now()) @map("fecha_creacion")
-  
-  usuario usuarios @relation(fields: [usuarioId], references: [id])
-  
+  id                Int      @id @default(autoincrement())
+  usuarioId         Int      @map("usuario_id")
+  accion            String   @map("accion")
+  tabla             String   @map("tabla")
+  registroId        Int?     @map("registro_id")
+  valoresAnteriores Json?    @map("valores_anteriores")
+  valoresNuevos     Json?    @map("valores_nuevos")
+  direccionIP       String?  @map("direccion_ip")
+  fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
+  usuario           usuarios @relation(fields: [usuarioId], references: [id])
+
   @@map("audit_logs")
 }
 

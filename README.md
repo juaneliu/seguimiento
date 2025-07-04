@@ -1,30 +1,54 @@
-# Tablero Estadístico SAEM
+# Plataforma de Seguimiento SAEM
 
-Sistema de tablero estadístico para seguimiento y control.
+Sistema de tablero estadístico para seguimiento, ejecución y evaluación del Sistema Anticorrupción del Estado de Morelos.
 
-## Tecnologías
-- Next.js 15
-- PostgreSQL
-- Prisma ORM
-- TypeScript
-- Tailwind CSS
+## 🚀 Tecnologías
 
-## Deploy en Oracle Cloud
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Prisma ORM
+- **Base de datos**: PostgreSQL
+- **Despliegue**: Nginx, PM2
+- **Sistema de auditoría**: Completo con logs de actividad
 
-1. Crear instancia Ubuntu 22.04
-2. Ejecutar script de deploy:
-   ```bash
-   bash deploy.sh
-   ```
+## 📦 Instalación
 
-## Configuración
+```bash
+# Clonar repositorio
+git clone <repo-url>
+cd seguimiento
 
-1. Actualizar `.env.production` con los valores correctos
-2. Cambiar dominio en `nginx.conf`
-3. Configurar SSL con Let's Encrypt
+# Instalar dependencias
+npm install
 
-## Scripts disponibles
+# Configurar base de datos
+./setup-database.sh
 
-- `npm run dev` - Servidor de desarrollo
-- `npm run build` - Build de producción
-- `npm run start` - Servidor de producción
+# Compilar proyecto
+npm run build
+
+# Iniciar en producción
+npm start
+```
+
+## 🔧 Configuración
+
+1. Configurar variables de entorno en `.env`
+2. Ajustar dominio en `nginx.conf` 
+3. Ejecutar migraciones de Prisma
+4. Crear usuario administrador inicial
+
+## 🛡️ Funcionalidades
+
+- ✅ Dashboard estadístico
+- ✅ Gestión de acuerdos y seguimientos
+- ✅ Diagnósticos municipales
+- ✅ Directorio de OIC
+- ✅ Interfaz responsive
+
+## 📊 Estado del Proyecto
+
+**Sistema en producción** - Completamente funcional con todas las características implementadas.
+
+---
+
+**Desarrollado SAEM Morelos** | **Versión**: 1.0 | **Año**: 2025

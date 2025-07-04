@@ -6,8 +6,11 @@ const nextConfig: NextConfig = {
   
   // Optimizaciones de rendimiento avanzadas
   experimental: {
-    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', 'recharts', '@prisma/client'],
+    optimizePackageImports: ['@radix-ui/react-icons', 'recharts'],
   },
+  
+  // Configuración de paquetes externos
+  serverExternalPackages: ['@prisma/client'],
   
   // Configuración de Turbopack (estable)
   turbopack: {
@@ -112,11 +115,6 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), payment=()'
-          },
-          // CSP Header básico
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.amcharts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';"
           }
         ],
       },

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { AuthService } from '@/lib/auth-service'
-import { cookies } from 'next/headers'
+import { AuditService } from '@/lib/audit-service'
+import { cookies, headers } from 'next/headers'
 
 // Middleware para verificar permisos de administrador
 async function verifyAdmin() {
@@ -21,9 +22,19 @@ async function verifyAdmin() {
 
 export async function GET() {
   try {
-    await verifyAdmin()
+    const currentUser = await verifyAdmin()
     
     const users = await AuthService.getUsers()
+    
+    // Registrar auditoría
+    const headersList = await headers()
+    await AuditService.registrarAccion({
+      usuarioId: currentUser.id,
+      accion: 'CONSULTAR_USUARIOS',
+      tabla: 'usuarios',
+      direccionIP: headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || '127.0.0.1'
+    })
+    
     return NextResponse.json(users)
   } catch (error: any) {
     console.error('API Error fetching users:', error)
@@ -36,7 +47,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await verifyAdmin()
+    const currentUser = await verifyAdmin()
     
     const body = await request.json()
     const { email, nombre, apellido, password, rol } = body
@@ -64,6 +75,22 @@ export async function POST(request: Request) {
       apellido,
       password,
       rol
+    })
+
+    // Registrar auditoría
+    const headersList = await headers()
+    await AuditService.registrarAccion({
+      usuarioId: currentUser.id,
+      accion: 'CREAR_USUARIO',
+      tabla: 'usuarios',
+      registroId: newUser.id,
+      valoresNuevos: {
+        email: newUser.email,
+        nombre: newUser.nombre,
+        apellido: newUser.apellido,
+        rol: newUser.rol
+      },
+      direccionIP: headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || '127.0.0.1'
     })
 
     return NextResponse.json(newUser, { status: 201 })

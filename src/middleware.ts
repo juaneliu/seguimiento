@@ -18,8 +18,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Agregar headers de seguridad básicos
+  // Crear respuesta y agregar headers de seguridad
   const response = NextResponse.next()
+  
+  // Remover cualquier CSP existente y agregar el correcto
+  response.headers.delete('content-security-policy')
+  response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.amcharts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self';")
   
   response.headers.set('X-Frame-Options', 'SAMEORIGIN')
   response.headers.set('X-Content-Type-Options', 'nosniff')
