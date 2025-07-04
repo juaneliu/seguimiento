@@ -73,6 +73,8 @@ export default function UsersPage() {
   const [editUserId, setEditUserId] = useState<number | null>(null)
 
   const [activeTab, setActiveTab] = useState<'usuarios' | 'informes' | 'auditorias'>('usuarios')
+  const [auditLogs, setAuditLogs] = useState<any[]>([])
+  const [auditLoading, setAuditLoading] = useState(false)
 
   const fetchUsers = async () => {
     try {
@@ -89,6 +91,24 @@ export default function UsersPage() {
       setError('Error de conexión')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchAuditLogs = async () => {
+    try {
+      setAuditLoading(true)
+      const response = await apiGet('/api/audit-logs?limit=20')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setAuditLogs(data.logs || [])
+      } else {
+        console.error('Error al cargar logs de auditoría:', data.error)
+      }
+    } catch (error) {
+      console.error('Error de conexión al cargar logs:', error)
+    } finally {
+      setAuditLoading(false)
     }
   }
 
@@ -288,6 +308,12 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'auditorias') {
+      fetchAuditLogs()
+    }
+  }, [activeTab])
 
   // Estadísticas
   const totalUsuarios = users.length
@@ -703,30 +729,95 @@ export default function UsersPage() {
           {activeTab === 'auditorias' && (
             <Card>
               <CardHeader>
-                <CardTitle>Auditoría y logs de usuarios</CardTitle>
+                <CardTitle className="flex items-center space-x-2">
+                  <Shield className="h-5 w-5" />
+                  <span>Auditoría y logs de usuarios</span>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-200/60 dark:border-slate-600/60 bg-gradient-to-r from-slate-50/80 via-blue-50/60 to-indigo-50/40 dark:from-slate-800/80 dark:via-slate-700/60 dark:to-slate-600/40">
-                        <th className="px-4 py-2 text-left">Fecha</th>
-                        <th className="px-4 py-2 text-left">Usuario</th>
-                        <th className="px-4 py-2 text-left">Acción</th>
-                        <th className="px-4 py-2 text-left">Detalle</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.slice(0, 10).map((u, i) => (
-                        <tr key={u.id + '-log'} className="border-b border-slate-100 dark:border-slate-800">
-                          <td className="px-4 py-2">{new Date(Date.now() - i * 3600 * 1000).toLocaleString('es-MX')}</td>
-                          <td className="px-4 py-2">{u.nombre} {u.apellido}</td>
-                          <td className="px-4 py-2">{i % 2 === 0 ? 'Inicio de sesión' : 'Actualización de perfil'}</td>
-                          <td className="px-4 py-2">{i % 2 === 0 ? 'Acceso exitoso al sistema' : 'El usuario actualizó sus datos'}</td>
+                {auditLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2">Cargando logs de auditoría...</span>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200/60 dark:border-slate-600/60 bg-gradient-to-r from-slate-50/80 via-blue-50/60 to-indigo-50/40 dark:from-slate-800/80 dark:via-slate-700/60 dark:to-slate-600/40">
+                          <th className="px-4 py-2 text-left">Fecha</th>
+                          <th className="px-4 py-2 text-left">Usuario</th>
+                          <th className="px-4 py-2 text-left">Acción</th>
+                          <th className="px-4 py-2 text-left">Tabla</th>
+                          <th className="px-4 py-2 text-left">IP</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {auditLogs.length > 0 ? (
+                          auditLogs.map((log) => (
+                            <tr key={log.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                              <td className="px-4 py-2">
+                                {new Date(log.fechaCreacion).toLocaleString('es-MX', {
+                                  year: 'numeric',
+                                  month: '2-digit',
+                                  day: '2-digit',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </td>
+                              <td className="px-4 py-2">
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{log.usuario?.nombre} {log.usuario?.apellido}</span>
+                                  <span className="text-xs text-slate-500">{log.usuario?.email}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-2">
+                                <Badge variant={
+                                  log.accion === 'LOGIN_EXITOSO' ? 'default' :
+                                  log.accion === 'CREAR' ? 'default' :
+                                  log.accion === 'ACTUALIZAR' ? 'secondary' :
+                                  log.accion === 'ELIMINAR' ? 'destructive' :
+                                  'outline'
+                                }>
+                                  {log.accion}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-2">
+                                <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                                  {log.tabla}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2">
+                                <span className="text-xs text-slate-500 font-mono">
+                                  {log.direccionIP || 'unknown'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                              No hay logs de auditoría disponibles
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                
+                <div className="mt-4 flex justify-between items-center">
+                  <button
+                    onClick={fetchAuditLogs}
+                    disabled={auditLoading}
+                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {auditLoading ? 'Actualizando...' : 'Actualizar logs'}
+                  </button>
+                  
+                  <span className="text-sm text-slate-500">
+                    Mostrando {auditLogs.length} registros más recientes
+                  </span>
                 </div>
               </CardContent>
             </Card>

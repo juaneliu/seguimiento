@@ -108,6 +108,26 @@ model usuarios {
   ultimoAcceso DateTime?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime
+  audit_logs   audit_logs[]
+}
+
+model audit_logs {
+  id               Int      @id @default(autoincrement())
+  usuarioId        Int
+  accion           String
+  tabla            String
+  registroId       Int?
+  datosAnteriores  Json?
+  datosNuevos      Json?
+  direccionIP      String?
+  userAgent        String?
+  fechaCreacion    DateTime @default(now())
+  usuario          usuarios @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@index([tabla])
+  @@index([accion])
+  @@index([fechaCreacion])
 }
 
 enum RolUsuario {
