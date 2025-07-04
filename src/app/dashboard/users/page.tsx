@@ -97,16 +97,30 @@ export default function UsersPage() {
   const fetchAuditLogs = async () => {
     try {
       setAuditLoading(true)
+      console.log('🔍 Fetching audit logs...')
+      
       const response = await apiGet('/api/audit-logs?limit=20')
       const data = await response.json()
       
+      console.log('📊 Audit logs response:', { 
+        status: response.status, 
+        ok: response.ok, 
+        data: data 
+      })
+      
       if (response.ok) {
         setAuditLogs(data.logs || [])
+        console.log('✅ Audit logs loaded:', data.logs?.length || 0)
       } else {
-        console.error('Error al cargar logs de auditoría:', data.error)
+        console.error('❌ Error al cargar logs de auditoría:', data.error)
+        // Mostrar mensaje de error al usuario
+        if (data.error) {
+          showError('Error de auditoría', data.error)
+        }
       }
     } catch (error) {
-      console.error('Error de conexión al cargar logs:', error)
+      console.error('❌ Error de conexión al cargar logs:', error)
+      showError('Error de conexión', 'No se pudo cargar los logs de auditoría')
     } finally {
       setAuditLoading(false)
     }
