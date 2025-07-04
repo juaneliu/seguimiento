@@ -1,11 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Users, Notebook, LogOut, UserCircle, FileText, Calendar } from "lucide-react"
+import { LayoutDashboard, Users, Notebook, FileText, Calendar, UserCircle } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
 
 interface NavItem {
   title: string
@@ -43,13 +42,7 @@ const items: NavItem[] = [
 
 export function MainNav() {
   const pathname = usePathname()
-  const router = useRouter()
-  const { user, logout, hasPermission } = useAuth()
-
-  const handleLogout = async () => {
-    await logout()
-    router.push('/login')
-  }
+  const { user, hasPermission } = useAuth()
 
   const getAvatarColor = (rol: string) => {
     switch (rol) {
@@ -188,20 +181,6 @@ export function MainNav() {
             )
           })}
         </div>
-        
-        {/* Solo mostrar botón de cerrar sesión si hay usuario autenticado y no es INVITADO */}
-        {user && user.rol !== 'INVITADO' && (
-          <div className="border-t border-slate-200/60 dark:border-slate-700/60 p-3 bg-gradient-to-r from-white/60 to-slate-50/60 dark:from-slate-800/60 dark:to-slate-700/60">
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="w-full justify-start text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-gradient-to-r hover:from-red-50/60 hover:to-red-50/40 dark:hover:from-red-900/20 dark:hover:to-red-900/10 group transition-colors duration-300 ease-out border border-transparent hover:border-red-100/50 dark:hover:border-red-800/50"
-            >
-              <LogOut className="mr-3 h-4 w-4 flex-shrink-0 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300" />
-              <span className="tracking-wide whitespace-nowrap group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">Cerrar Sesión</span>
-            </Button>
-          </div>
-        )}
       </div>
     </nav>
   )
