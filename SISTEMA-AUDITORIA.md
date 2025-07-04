@@ -5,7 +5,16 @@ Se ha mejorado el sistema de auditoría para registrar **toda la actividad** de 
 
 ## 🚀 Cambios Implementados
 
-### 1. **Modelo de Base de Datos**
+### 1. **Corrección del Sistema de Autenticación**
+
+**Problema identificado:** El sistema de autenticación JWT usaba cookies para almacenar el token, pero las peticiones del frontend no incluían las cookies automáticamente.
+
+**Solución implementada:**
+- Modificado `/src/lib/api.ts` para incluir `credentials: 'include'` en todas las peticiones
+- Actualizado `/src/app/api/audit-logs/route.ts` para aceptar tokens tanto del header Authorization como de las cookies
+- Esto mantiene la compatibilidad con ambos métodos de autenticación
+
+### 2. **Modelo de Base de Datos**
 - **Tabla `audit_logs`**: Diseñada para registrar todas las acciones
   - `usuarioId`: Usuario que realizó la acción
   - `accion`: Tipo de acción (CREAR, ACTUALIZAR, ELIMINAR, LOGIN_EXITOSO, etc.)
@@ -149,6 +158,26 @@ Se ha mejorado el sistema de auditoría para registrar **toda la actividad** de 
 
 ---
 
-**Estado Actual**: ✅ Implementación base completada  
+## 🔧 **Corrección del Error 401**
+
+### **Problema Original**
+```
+/api/audit-logs?limit=20:1 Failed to load resource: the server responded with a status of 401 ()
+Error al cargar logs de auditoría: Token no proporcionado
+```
+
+### **Solución Implementada**
+1. **Identificado** que el token JWT se almacenaba en cookies pero no se enviaba en las peticiones
+2. **Agregado** `credentials: 'include'` a todas las peticiones API en `/src/lib/api.ts`
+3. **Modificado** el endpoint `/api/audit-logs/route.ts` para aceptar tokens tanto de cookies como del header Authorization
+4. **Verificado** que la aplicación se compila y despliega correctamente
+
+### **Verificación del Sistema**
+✅ Compilación exitosa sin errores  
+✅ Aplicación desplegada y funcionando  
+✅ Endpoint de auditoría accesible  
+✅ Sistema de autenticación funcional
+
+**Estado Actual**: ✅ Error 401 corregido - Sistema funcionando correctamente  
 **Fecha**: 4 de julio de 2025  
-**Próxima fase**: Integración completa con todas las APIs
+**Próxima fase**: Implementar logs reales y filtros avanzados

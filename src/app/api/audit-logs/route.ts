@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { AuthService } from '@/lib/auth-service'
+import { cookies } from 'next/headers'
 
 const prisma = new PrismaClient()
 
 export async function GET(request: NextRequest) {
   try {
-    // Obtener token del header
+    // Obtener token del header Authorization o de las cookies
     const authHeader = request.headers.get('authorization')
-    const token = authHeader?.replace('Bearer ', '')
+    let token = authHeader?.replace('Bearer ', '')
+    
+    // Si no hay token en el header, intentar obtenerlo de las cookies
+    if (!token) {
+      const cookieStore = await cookies()
+      token = cookieStore.get('auth-token')?.value
+    }
     
     if (!token) {
       return NextResponse.json(
