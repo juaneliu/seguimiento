@@ -1,4 +1,4 @@
-// Utilidades para realizar solicitudes API con protección CSRF
+// Utilidades para realizar solicitudes API con protección CSRF y autenticación JWT
 
 function getCsrfToken(): string | null {
   const cookies = document.cookie.split(';')
@@ -11,12 +11,23 @@ function getCsrfToken(): string | null {
   return null
 }
 
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('token')
+}
+
 export async function apiRequest(url: string, options: RequestInit = {}): Promise<Response> {
   const csrfToken = getCsrfToken()
+  const authToken = getAuthToken()
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
+  }
+  
+  // Agregar token de autenticación JWT si está disponible
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`
   }
   
   // Agregar token CSRF para solicitudes que modifican estado
