@@ -11,70 +11,20 @@
   "icons": [
     {
       "src": "/icons/favicon.png",
-      "sizes": "192x192",
+      "sizes": "16x16",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/icons/favicon.png",
-      "sizes": "512x512",
+      "src": "/favicon.png",
+      "sizes": "16x16",
       "type": "image/png",
       "purpose": "any"
     }
   ],
   "categories": ["productivity", "business"],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/dashboard-mobile.png",
-      "sizes": "375x667",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Dashboard Principal",
-      "short_name": "Dashboard",
-      "description": "Acceso rápido al tablero principal",
-      "url": "/dashboard",
-      "icons": [
-        {
-          "src": "/icons/dashboard.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Directorio OIC",
-      "short_name": "OIC",
-      "description": "Gestión del directorio de OIC",
-      "url": "/dashboard/directorio",
-      "icons": [
-        {
-          "src": "/icons/directory.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Entes Públicos",
-      "short_name": "Entes",
-      "description": "Gestión de entes públicos",
-      "url": "/dashboard/entes",
-      "icons": [
-        {
-          "src": "/icons/entities.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ],
+  "screenshots": [],
+  "shortcuts": [],
   "prefer_related_applications": false,
   "related_applications": [],
   "protocol_handlers": [],
