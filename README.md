@@ -37,6 +37,23 @@ npm start
 3. Ejecutar migraciones de Prisma
 4. Crear usuario administrador inicial
 
+### Configuración de Nginx
+
+La configuración de nginx para el sitio está incluida en el archivo `nginx.conf`. Para instalar:
+
+```bash
+# Copiar configuración a nginx
+sudo cp nginx.conf /etc/nginx/sites-available/seguimiento.saem.gob.mx
+
+# Habilitar sitio
+sudo ln -s /etc/nginx/sites-available/seguimiento.saem.gob.mx /etc/nginx/sites-enabled/
+
+# Reiniciar nginx
+sudo systemctl restart nginx
+```
+
+**Nota**: La configuración incluye SSL/TLS con Let's Encrypt y todas las cabeceras de seguridad necesarias.
+
 ## 🛡️ Funcionalidades
 
 - ✅ Dashboard estadístico
