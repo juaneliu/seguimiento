@@ -1062,6 +1062,17 @@ export function TableroAcuerdos() {
                       </Badge>
                     )}
                   </Label>
+                  {user && user.rol !== 'INVITADO' && (
+                    <Button 
+                      onClick={() => openSeguimientos(selectedAcuerdo)}
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Agregar Seguimiento</span>
+                      <span className="sm:hidden">Agregar</span>
+                    </Button>
+                  )}
                 </div>
                 
                 {selectedAcuerdo.seguimientos && selectedAcuerdo.seguimientos.length > 0 ? (
@@ -1121,9 +1132,19 @@ export function TableroAcuerdos() {
                 ) : (
                   <div className="text-center py-6">
                     <MessageSquare className="h-8 w-8 sm:h-12 sm:w-12 text-slate-400 dark:text-slate-600 mx-auto mb-2 sm:mb-3" />
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-4">
                       No hay seguimientos registrados para este acuerdo
                     </p>
+                    {user && user.rol !== 'INVITADO' && (
+                      <Button 
+                        onClick={() => openSeguimientos(selectedAcuerdo)}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm"
+                      >
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                        Agregar Primer Seguimiento
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
