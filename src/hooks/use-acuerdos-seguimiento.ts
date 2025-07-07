@@ -113,16 +113,26 @@ export function useAcuerdosSeguimiento() {
   // Eliminar acuerdo
   const deleteAcuerdo = async (id: number) => {
     try {
+      // Actualizar optimistamente la UI primero
+      setAcuerdos(prev => prev.filter(a => a.id !== id))
+      
       const response = await fetch(`/api/acuerdos/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Timeout de 10 segundos
+        signal: AbortSignal.timeout(10000)
       })
 
       if (!response.ok) {
+        // Si falla, restaurar el acuerdo en la lista
+        await fetchAcuerdos()
         throw new Error('Error al eliminar acuerdo')
       }
-
-      setAcuerdos(prev => prev.filter(a => a.id !== id))
     } catch (err) {
+      // Si hay error, recargar la lista para asegurar consistencia
+      await fetchAcuerdos()
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido'
       await showError('Error', `No se pudo eliminar el acuerdo: ${errorMessage}`)
       throw err

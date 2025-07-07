@@ -322,7 +322,14 @@ export function TableroAcuerdos() {
 
     if (result.isConfirmed) {
       try {
+        // Cerrar el modal inmediatamente para mejor UX
+        setShowDetails(false)
+        setSelectedAcuerdo(null)
+        
+        // Mostrar notificación de progreso
         await deleteAcuerdo(id)
+        
+        // Mostrar éxito
         await showSuccess(
           '¡Eliminado!',
           'El acuerdo ha sido eliminado exitosamente.'
@@ -1152,13 +1159,23 @@ export function TableroAcuerdos() {
               {/* Botones de acción fijos en la parte inferior */}
               <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 border-t border-border mt-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm -mx-4 -mb-4 px-4 pb-4 flex-shrink-0">
                 {user && user.rol !== 'INVITADO' && (
-                  <Button 
-                    onClick={() => openEditForm(selectedAcuerdo)}
-                    className="bg-primary text-primary-foreground text-xs sm:text-sm"
-                  >
-                    <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                    Editar Acuerdo
-                  </Button>
+                  <>
+                    <Button 
+                      onClick={() => handleEliminarAcuerdo(selectedAcuerdo.id!, selectedAcuerdo.temaAgenda)}
+                      variant="destructive"
+                      className="text-xs sm:text-sm"
+                    >
+                      <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                      Eliminar Acuerdo
+                    </Button>
+                    <Button 
+                      onClick={() => openEditForm(selectedAcuerdo)}
+                      className="bg-primary text-primary-foreground text-xs sm:text-sm"
+                    >
+                      <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+                      Editar Acuerdo
+                    </Button>
+                  </>
                 )}
               </div>
             </CardContent>

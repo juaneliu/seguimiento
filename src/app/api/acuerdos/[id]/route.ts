@@ -81,14 +81,17 @@ export async function DELETE(
 ) {
   const { id } = await params
   try {
-    // Eliminar seguimientos primero
-    await prisma.seguimientos.deleteMany({
-      where: { acuerdoId: parseInt(id) }
-    })
+    // Usar transacción para eliminar todo de una vez
+    await prisma.$transaction(async (tx) => {
+      // Eliminar seguimientos primero
+      await tx.seguimientos.deleteMany({
+        where: { acuerdoId: parseInt(id) }
+      })
 
-    // Luego eliminar el acuerdo
-    await prisma.acuerdos_seguimiento.delete({
-      where: { id: parseInt(id) }
+      // Luego eliminar el acuerdo
+      await tx.acuerdos_seguimiento.delete({
+        where: { id: parseInt(id) }
+      })
     })
 
     return NextResponse.json({ message: 'Acuerdo eliminado exitosamente' })

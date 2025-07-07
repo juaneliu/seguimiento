@@ -95,6 +95,8 @@ model seguimientos {
   fechaActualizacion   DateTime
   creadoPor            String?
   acuerdos_seguimiento acuerdos_seguimiento @relation(fields: [acuerdoId], references: [id], onDelete: Cascade)
+
+  @@index([acuerdoId])
 }
 
 model usuarios {
