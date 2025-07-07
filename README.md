@@ -37,6 +37,31 @@ npm start
 3. Ejecutar migraciones de Prisma
 4. Crear usuario administrador inicial
 
+## 🚀 Despliegue con PM2
+
+```bash
+# Iniciar con PM2 (recomendado para producción)
+pm2 start ecosystem.config.js
+
+# Configurar inicio automático
+pm2 save
+pm2 startup
+
+# Monitoreo
+pm2 status
+pm2 logs seguimiento-saem
+pm2 monit
+```
+
+## 🔍 Monitoreo y Mantenimiento
+
+- **Monitor automático**: Cada 5 minutos via crontab
+- **Scripts disponibles**:
+  - `./maintenance-commands.sh` - Comandos útiles
+  - `./monitor-health.sh` - Monitoreo automático
+  - `./emergency-restart.sh` - Reinicio de emergencia
+- **Logs**: `/home/ubuntu/seguimiento/logs/`
+
 ### Configuración de Nginx
 
 La configuración de nginx para el sitio está incluida en el archivo `nginx.conf`. Para instalar:
