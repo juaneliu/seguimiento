@@ -61,13 +61,13 @@ const navItems: NavItem[] = [
     title: "Entes Públicos", 
     href: "/dashboard/entes",
     icon: Users,
-    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
     title: "Diagnósticos",
     href: "/dashboard/diagnosticos",
     icon: FileText,
-    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
     title: "Acuerdos",
@@ -79,7 +79,7 @@ const navItems: NavItem[] = [
     title: "Directorio",
     href: "/dashboard/directorio", 
     icon: Notebook,
-    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
     title: "Usuarios",

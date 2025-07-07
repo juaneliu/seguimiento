@@ -98,19 +98,19 @@ export function MainNav() {
         title: "Entes Públicos", 
         href: "/dashboard/entes",
         icon: Users,
-        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
       },
       {
         title: "Directorio",
         href: "/dashboard/directorio", 
         icon: Notebook,
-        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
       },
       {
         title: "Diagnósticos Municipios",
         href: "/dashboard/diagnosticos",
         icon: FileText,
-        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']
+        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
       },
       {
         title: "Acuerdos y Seguimientos",

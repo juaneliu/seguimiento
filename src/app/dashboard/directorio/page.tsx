@@ -22,7 +22,7 @@ import { Users2, Search, Plus, MoreHorizontal, Edit, Trash2, Mail, Phone, Buildi
 
 export default function DirectorioPage() {
   return (
-    <ProtectedRoute allowedRoles={['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']}>
+    <ProtectedRoute allowedRoles={['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']}>
       <DirectorioPageContent />
     </ProtectedRoute>
   )

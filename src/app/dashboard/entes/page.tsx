@@ -27,7 +27,7 @@ import { DatabaseStatus } from "@/components/database-status"
 
 export default function EntesPage() {
   return (
-    <ProtectedRoute allowedRoles={['INVITADO', 'OPERATIVO', 'ADMINISTRADOR']}>
+    <ProtectedRoute allowedRoles={['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']}>
       <EntesPageContent />
     </ProtectedRoute>
   )
