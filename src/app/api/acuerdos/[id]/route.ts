@@ -45,17 +45,23 @@ export async function PUT(
   try {
     const data = await request.json()
     
+    // Función helper para crear fechas locales sin problemas de zona horaria
+    const createLocalDate = (dateString: string) => {
+      const [year, month, day] = dateString.split('-').map(Number)
+      return new Date(year, month - 1, day) // month - 1 porque Date usa 0-indexing para meses
+    }
+    
     const acuerdo = await prisma.acuerdos_seguimiento.update({
       where: { id: parseInt(id) },
       data: {
         numeroSesion: data.numeroSesion,
         tipoSesion: data.tipoSesion,
-        fechaSesion: new Date(data.fechaSesion),
+        fechaSesion: createLocalDate(data.fechaSesion),
         temaAgenda: data.temaAgenda,
         descripcionAcuerdo: data.descripcionAcuerdo,
         responsable: data.responsable,
         area: data.area,
-        fechaCompromiso: new Date(data.fechaCompromiso),
+        fechaCompromiso: createLocalDate(data.fechaCompromiso),
         prioridad: data.prioridad,
         estado: data.estado,
         observaciones: data.observaciones,

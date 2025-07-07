@@ -239,19 +239,33 @@ export function TableroAcuerdos() {
     }
   }
 
-  // Función para formatear fecha
-  const formatFecha = (fecha: string) => {
-    return new Date(fecha).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    })
+  // Función para formatear fecha sin problemas de zona horaria
+  const formatFecha = (fecha: string | Date) => {
+    const date = new Date(fecha)
+    // Verificar si es una fecha válida
+    if (isNaN(date.getTime())) return 'Fecha inválida'
+    
+    // Usar getFullYear, getMonth, getDate para evitar problemas de zona horaria
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const day = date.getDate()
+    
+    const monthNames = [
+      'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+      'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+    ]
+    
+    return `${day} ${monthNames[month]} ${year}`
   }
 
-  // Función para calcular días restantes
-  const diasRestantes = (fechaCompromiso: string) => {
+  // Función para calcular días restantes sin problemas de zona horaria
+  const diasRestantes = (fechaCompromiso: string | Date) => {
     const hoy = new Date()
+    hoy.setHours(0, 0, 0, 0) // Normalizar a medianoche
+    
     const compromiso = new Date(fechaCompromiso)
+    compromiso.setHours(0, 0, 0, 0) // Normalizar a medianoche
+    
     const diferencia = Math.ceil((compromiso.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24))
     
     if (diferencia < 0) {
@@ -1276,15 +1290,25 @@ interface FormularioEdicionAcuerdoProps {
 }
 
 function FormularioEdicionAcuerdo({ acuerdo, onSave, onCancel }: FormularioEdicionAcuerdoProps) {
+  // Función helper para formatear fechas para input sin problemas de zona horaria
+  const formatDateForInput = (dateValue: string | Date) => {
+    if (!dateValue) return ''
+    const date = new Date(dateValue)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const [formData, setFormData] = useState({
     numeroSesion: acuerdo.numeroSesion || '',
     tipoSesion: acuerdo.tipoSesion || '',
-    fechaSesion: acuerdo.fechaSesion ? new Date(acuerdo.fechaSesion).toISOString().split('T')[0] : '',
+    fechaSesion: formatDateForInput(acuerdo.fechaSesion),
     temaAgenda: acuerdo.temaAgenda || '',
     descripcionAcuerdo: acuerdo.descripcionAcuerdo || '',
     responsable: acuerdo.responsable || '',
     area: acuerdo.area || '',
-    fechaCompromiso: acuerdo.fechaCompromiso ? new Date(acuerdo.fechaCompromiso).toISOString().split('T')[0] : '',
+    fechaCompromiso: formatDateForInput(acuerdo.fechaCompromiso),
     prioridad: acuerdo.prioridad || '',
     estado: acuerdo.estado || '',
     observaciones: acuerdo.observaciones || ''
