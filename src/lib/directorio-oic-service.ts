@@ -13,7 +13,8 @@ export type DirectorioOICData = {
   entidad: {
     nombre: string
   }
-  directorio_oic_entesIds: number[] // IDs de los entes públicos asociados
+  directorio_oic_entesIds?: number[] // IDs de los entes públicos asociados
+  entesPublicosIds?: number[] // Nombre alternativo para compatibilidad
   createdAt?: Date
   updatedAt?: Date
 }
@@ -125,14 +126,17 @@ export class DirectorioOICService {
 
   static async create(data: Omit<DirectorioOICData, 'id' | 'createdAt' | 'updatedAt'>): Promise<DirectorioOICWithEntes> {
     try {
-      const { directorio_oic_entesIds, ...directorioData } = data
+      const { directorio_oic_entesIds, entesPublicosIds, ...directorioData } = data
+      
+      // Usar cualquiera de los dos nombres de propiedad para compatibilidad
+      const entesIds = directorio_oic_entesIds || entesPublicosIds || []
 
       const directorio = await prisma.directorio_oic.create({
         data: {
           ...directorioData,
           updatedAt: new Date(),
           directorio_oic_entes: {
-            create: directorio_oic_entesIds.map((enteId: number) => ({
+            create: entesIds.map((enteId: number) => ({
               entePublicoId: enteId
             }))
           }
@@ -174,19 +178,22 @@ export class DirectorioOICService {
 
   static async update(id: number, data: Partial<Omit<DirectorioOICData, 'id' | 'createdAt' | 'updatedAt'>>): Promise<DirectorioOICWithEntes> {
     try {
-      const { directorio_oic_entesIds, ...directorioData } = data
+      const { directorio_oic_entesIds, entesPublicosIds, ...directorioData } = data
+
+      // Usar cualquiera de los dos nombres de propiedad para compatibilidad
+      const entesIds = directorio_oic_entesIds || entesPublicosIds
 
       // Si se proporcionan nuevos entes públicos, actualizar las relaciones
-      if (directorio_oic_entesIds !== undefined) {
+      if (entesIds !== undefined) {
         // Eliminar relaciones existentes
         await prisma.directorio_oic_entes.deleteMany({
           where: { directorioOICId: id }
         })
         
         // Crear nuevas relaciones
-        if (directorio_oic_entesIds.length > 0) {
+        if (entesIds.length > 0) {
           await prisma.directorio_oic_entes.createMany({
-            data: directorio_oic_entesIds.map((enteId: number) => ({
+            data: entesIds.map((enteId: number) => ({
               directorioOICId: id,
               entePublicoId: enteId
             }))
