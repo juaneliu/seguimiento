@@ -25,6 +25,9 @@ import { useAuth } from "@/contexts/auth-context"
 import { ProtectedRoute } from "@/components/protected-route"
 import { DatabaseStatus } from "@/components/database-status"
 
+// Forzar renderizado dinámico para evitar caché estático
+export const dynamic = 'force-dynamic'
+
 export default function EntesPage() {
   return (
     <ProtectedRoute allowedRoles={['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']}>
@@ -38,6 +41,9 @@ function EntesPageContent() {
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [activeView, setActiveView] = useState('sujetos-obligados')
+  
+  // Timestamp para invalidar caché del navegador
+  const [buildTime] = useState(() => Date.now())
   
   // Verificar si el usuario puede editar/eliminar
   const canEdit = user?.rol !== 'INVITADO'
@@ -148,6 +154,7 @@ function EntesPageContent() {
   return (
     <main className="w-full">
       <ScrollArea className="h-full">
+        {/* Timestamp para invalidar caché: {buildTime} */}
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
           {/* Header responsive */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

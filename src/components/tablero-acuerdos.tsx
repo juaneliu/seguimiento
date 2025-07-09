@@ -419,14 +419,14 @@ export function TableroAcuerdos() {
       {/* Estadísticas rápidas */}
       <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 dark:from-blue-950 dark:via-blue-900 dark:to-blue-800 border-blue-200 dark:border-blue-700 shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-3 md:p-4 lg:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 p-2 sm:p-3">
             <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-blue-900 dark:text-blue-100">Total Acuerdos</CardTitle>
-            <div className="p-1 sm:p-1.5 md:p-2 bg-blue-500/20 rounded-full">
+            <div className="p-1 sm:p-1.5 bg-blue-500/20 rounded-full">
               <FileText className="h-2 w-2 sm:h-3 sm:w-3 md:h-4 md:w-4 text-blue-600 dark:text-blue-400" />
             </div>
           </CardHeader>
-          <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 pt-0">
-            <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-blue-900 dark:text-blue-100">{totalAcuerdos}</div>
+          <CardContent className="p-2 sm:p-3 pt-0">
+            <div className="text-base sm:text-lg md:text-xl font-bold text-blue-900 dark:text-blue-100">{totalAcuerdos}</div>
             <p className="text-[9px] sm:text-xs text-blue-700 dark:text-blue-300 font-medium">
               Registrados en el sistema
             </p>
@@ -434,14 +434,14 @@ export function TableroAcuerdos() {
         </Card>
 
         <Card className="bg-gradient-to-br from-emerald-50 via-emerald-100 to-emerald-200 dark:from-emerald-950 dark:via-emerald-900 dark:to-emerald-800 border-emerald-200 dark:border-emerald-700 shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-3 md:p-4 lg:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 p-2 sm:p-3">
             <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-emerald-900 dark:text-emerald-100">Completados</CardTitle>
-            <div className="p-1 sm:p-1.5 md:p-2 bg-emerald-500/20 rounded-full">
+            <div className="p-1 sm:p-1.5 bg-emerald-500/20 rounded-full">
               <CheckCircle className="h-2 w-2 sm:h-3 sm:w-3 md:h-4 md:w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
           </CardHeader>
-          <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 pt-0">
-            <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-emerald-700 dark:text-emerald-300">{completados}</div>
+          <CardContent className="p-2 sm:p-3 pt-0">
+            <div className="text-base sm:text-lg md:text-xl font-bold text-emerald-700 dark:text-emerald-300">{completados}</div>
             <p className="text-[9px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-medium">
               {totalAcuerdos > 0 ? Math.round((completados / totalAcuerdos) * 100) : 0}% del total
             </p>
@@ -449,14 +449,14 @@ export function TableroAcuerdos() {
         </Card>
 
         <Card className="bg-gradient-to-br from-amber-50 via-amber-100 to-amber-200 dark:from-amber-950 dark:via-amber-900 dark:to-amber-800 border-amber-200 dark:border-amber-700 shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-3 md:p-4 lg:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 p-2 sm:p-3">
             <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-amber-900 dark:text-amber-100">En Progreso</CardTitle>
-            <div className="p-1 sm:p-1.5 md:p-2 bg-amber-500/20 rounded-full">
+            <div className="p-1 sm:p-1.5 bg-amber-500/20 rounded-full">
               <Clock className="h-2 w-2 sm:h-3 sm:w-3 md:h-4 md:w-4 text-amber-600 dark:text-amber-400" />
             </div>
           </CardHeader>
-          <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 pt-0">
-            <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-amber-700 dark:text-amber-300">{enProgreso}</div>
+          <CardContent className="p-2 sm:p-3 pt-0">
+            <div className="text-base sm:text-lg md:text-xl font-bold text-amber-700 dark:text-amber-300">{enProgreso}</div>
             <p className="text-[9px] sm:text-xs text-amber-600 dark:text-amber-400 font-medium">
               {totalAcuerdos > 0 ? Math.round((enProgreso / totalAcuerdos) * 100) : 0}% del total
             </p>
@@ -464,14 +464,14 @@ export function TableroAcuerdos() {
         </Card>
 
         <Card className="bg-gradient-to-br from-rose-50 via-rose-100 to-rose-200 dark:from-rose-950 dark:via-rose-900 dark:to-rose-800 border-rose-200 dark:border-rose-700 shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 p-2 sm:p-3 md:p-4 lg:p-6">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 p-2 sm:p-3">
             <CardTitle className="text-[10px] sm:text-xs md:text-sm font-medium text-rose-900 dark:text-rose-100">Vencidos</CardTitle>
-            <div className="p-1 sm:p-1.5 md:p-2 bg-rose-500/20 rounded-full">
+            <div className="p-1 sm:p-1.5 bg-rose-500/20 rounded-full">
               <AlertCircle className="h-2 w-2 sm:h-3 sm:w-3 md:h-4 md:w-4 text-rose-600 dark:text-rose-400" />
             </div>
           </CardHeader>
-          <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6 pt-0">
-            <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-rose-700 dark:text-rose-300">{vencidos}</div>
+          <CardContent className="p-2 sm:p-3 pt-0">
+            <div className="text-base sm:text-lg md:text-xl font-bold text-rose-700 dark:text-rose-300">{vencidos}</div>
             <p className="text-[9px] sm:text-xs text-rose-600 dark:text-rose-400 font-medium">
               Requieren atención inmediata
             </p>

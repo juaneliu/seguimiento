@@ -27,7 +27,7 @@ export default function DashboardLayout({
           <TopNav />
           <MainNav />
           <main className="lg:ml-64 pt-12 sm:pt-14 md:pt-16">
-            <div className="min-h-[calc(100vh-3rem)] sm:min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)] p-2 sm:p-3 md:p-4 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6 overflow-y-auto">
+            <div className="min-h-[calc(100vh-3rem)] sm:min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)] p-3 sm:p-4 md:p-6 lg:p-8 space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 overflow-y-auto">
               {children}
             </div>
           </main>

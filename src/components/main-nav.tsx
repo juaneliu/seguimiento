@@ -132,56 +132,59 @@ export function MainNav() {
   const filteredItems = getFilteredItems()
 
   return (
-    <nav className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-r border-slate-200/60 dark:border-slate-700/60 z-40 hidden lg:block shadow-lg">
-      <div className="flex flex-col h-full">
-        {/* User Info */}
-        {user && user.rol !== 'INVITADO' && (
-          <div className="p-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-gradient-to-r from-white/60 to-slate-50/60 dark:from-slate-800/60 dark:to-slate-700/60">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getAvatarColor(user.rol)}`}>
-                  <span className="text-sm font-bold text-white">
-                    {user.nombre.charAt(0)}{user.apellido.charAt(0)}
-                  </span>
+    <>
+      {/* Navegación de escritorio */}
+      <nav className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md border-r border-slate-200/60 dark:border-slate-700/60 z-40 hidden lg:block shadow-lg">
+        <div className="flex flex-col h-full">
+          {/* User Info */}
+          {user && user.rol !== 'INVITADO' && (
+            <div className="p-4 border-b border-slate-200/60 dark:border-slate-700/60 bg-gradient-to-r from-white/60 to-slate-50/60 dark:from-slate-800/60 dark:to-slate-700/60">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getAvatarColor(user.rol)}`}>
+                    <span className="text-sm font-bold text-white">
+                      {user.nombre.charAt(0)}{user.apellido.charAt(0)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                    {user.nombre} {user.apellido}
+                  </p>
+                  <p className={`text-xs truncate ${getRoleBadgeColor(user.rol)}`}>
+                    {user.rol}
+                  </p>
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
-                  {user.nombre} {user.apellido}
-                </p>
-                <p className={`text-xs truncate ${getRoleBadgeColor(user.rol)}`}>
-                  {user.rol}
-                </p>
-              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="flex-1 space-y-1 py-6 px-3 bg-gradient-to-b from-white/40 to-slate-50/40 dark:from-slate-800/40 dark:to-slate-700/40">
-          {filteredItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                  isActive 
-                    ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-100 border-l-4 border-blue-500 shadow-sm" 
-                    : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100/60 dark:hover:from-slate-700/60 dark:hover:to-slate-600/60"
-                )}
-              >
-                <Icon className={cn(
-                  "mr-3 h-4 w-4 flex-shrink-0 transition-colors",
-                  isActive ? "text-blue-700 dark:text-blue-300" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200"
-                )} />
-                <span className="tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">{item.title}</span>
-              </Link>
-            )
-          })}
+          <div className="flex-1 space-y-1 py-6 px-3 bg-gradient-to-b from-white/40 to-slate-50/40 dark:from-slate-800/40 dark:to-slate-700/40">
+            {filteredItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    isActive 
+                      ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-900 dark:text-blue-100 border-l-4 border-blue-500 shadow-sm" 
+                      : "text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-gradient-to-r hover:from-slate-50 hover:to-slate-100/60 dark:hover:from-slate-700/60 dark:hover:to-slate-600/60"
+                  )}
+                >
+                  <Icon className={cn(
+                    "mr-3 h-4 w-4 flex-shrink-0 transition-colors",
+                    isActive ? "text-blue-700 dark:text-blue-300" : "text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200"
+                  )} />
+                  <span className="tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">{item.title}</span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   )
 }
