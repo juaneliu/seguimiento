@@ -75,6 +75,12 @@ export default function EditarDirectorioPage() {
       const directorio = await getDirectorioById(directorioId)
       setDirectorioActual(directorio)
       
+      // Usar la propiedad entesPublicos que ahora devuelve el servicio
+      const entesPublicos = directorio.entesPublicos || []
+      
+      console.log('🔍 [EditarDirectorio] Directorio cargado:', directorio)
+      console.log('🔍 [EditarDirectorio] Entes públicos asociados:', entesPublicos)
+      
       setFormData({
         oicNombre: directorio.oicNombre,
         puesto: directorio.puesto,
@@ -83,7 +89,7 @@ export default function EditarDirectorioPage() {
         telefono: directorio.telefono || '',
         direccion: directorio.direccion || '',
         entidad: directorio.entidad,
-        entesPublicosIds: directorio.entesPublicos?.map((e: any) => e.id) || []
+        entesPublicosIds: entesPublicos.map((e: any) => e.id) || []
       })
     } catch (error) {
       console.error('Error al cargar directorio:', error)

@@ -13,7 +13,7 @@ export type DirectorioOIC = {
   entidad: {
     nombre: string
   }
-  entesPublicosIds: number[]
+  entesPublicosIds?: number[] // Para compatibilidad con formularios
   entesPublicos?: Array<{
     id: number
     nombre: string

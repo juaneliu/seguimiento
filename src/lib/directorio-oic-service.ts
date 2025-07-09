@@ -30,7 +30,7 @@ export type DirectorioOICWithEntes = {
   entidad: {
     nombre: string
   }
-  directorio_oic_entes: Array<{
+  entesPublicos: Array<{
     id: number
     nombre: string
     ambitoGobierno: string
@@ -73,7 +73,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
+        entesPublicos: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }))
@@ -114,7 +114,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
+        entesPublicos: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }
@@ -166,7 +166,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
+        entesPublicos: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }
@@ -229,7 +229,7 @@ export class DirectorioOICService {
         telefono: directorio.telefono,
         direccion: directorio.direccion,
         entidad: directorio.entidad as { nombre: string },
-        directorio_oic_entes: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
+        entesPublicos: directorio.directorio_oic_entes.map((ep: any) => ep.entes_publicos),
         createdAt: directorio.createdAt,
         updatedAt: directorio.updatedAt
       }

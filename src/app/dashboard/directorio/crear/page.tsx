@@ -811,19 +811,17 @@ export default function CrearDirectorioPage() {
                   const entesYaAsignados = directorios.flatMap(directorio => {
                     console.log('🔍 [EntesDropdown] Procesando directorio:', directorio)
                     console.log('🔍 [EntesDropdown] - OIC:', directorio.oicNombre)
-                    console.log('🔍 [EntesDropdown] - entesPublicosIds:', directorio.entesPublicosIds)
                     console.log('🔍 [EntesDropdown] - entesPublicos:', directorio.entesPublicos)
                     
-                    // Intentar obtener los IDs de diferentes formas posibles
-                    let ids: number[] = []
-                    if (directorio.entesPublicosIds) {
-                      ids = directorio.entesPublicosIds
-                    } else if (directorio.entesPublicos) {
-                      ids = directorio.entesPublicos.map((ente: any) => ente.id)
+                    // Usar entesPublicos que es lo que devuelve el servicio actualizado
+                    if (directorio.entesPublicos && Array.isArray(directorio.entesPublicos)) {
+                      const ids = directorio.entesPublicos.map((ente: any) => ente.id)
+                      console.log('🔍 [EntesDropdown] - IDs extraídos:', ids)
+                      return ids
                     }
                     
-                    console.log('🔍 [EntesDropdown] - IDs extraídos:', ids)
-                    return ids
+                    console.log('🔍 [EntesDropdown] - No se encontraron entes públicos en este directorio')
+                    return []
                   })
                   
                   console.log('🔍 [EntesDropdown] Entes totales:', entes.length)
