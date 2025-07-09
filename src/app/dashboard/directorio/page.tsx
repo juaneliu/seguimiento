@@ -328,11 +328,7 @@ function DirectorioPageContent() {
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">OIC</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Responsable</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">Puesto</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-48">Correo Electrónico</th>
-                          {canEdit && (
-                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">Teléfono</th>
-                          )}
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Dirección</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-56">Contacto</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Entes Asociados</th>
                           {canEdit && (
                             <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-24">Acciones</th>
@@ -352,35 +348,28 @@ function DirectorioPageContent() {
                               <div className="text-slate-600 dark:text-slate-400">{directorio.puesto}</div>
                             </td>
                             <td className="p-4">
-                              <div className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                                <Mail className="h-4 w-4 text-slate-400" />
-                                {directorio.correoElectronico}
-                              </div>
-                            </td>
-                            {canEdit && (
-                              <td className="p-4">
-                                <div className="text-sm text-slate-700 dark:text-slate-300">
-                                  {directorio.telefono ? (
-                                    <div className="flex items-center gap-2">
-                                      <Phone className="h-4 w-4 text-slate-400" />
-                                      {directorio.telefono}
-                                    </div>
-                                  ) : (
-                                    <span className="text-slate-400 dark:text-slate-500 italic">No especificado</span>
-                                  )}
+                              <div className="space-y-2">
+                                {/* Correo electrónico */}
+                                <div className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                  <Mail className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                                  <span className="break-all">{directorio.correoElectronico}</span>
                                 </div>
-                              </td>
-                            )}
-                            <td className="p-4">
-                              <div className="text-sm text-slate-700 dark:text-slate-300">
-                                {directorio.direccion ? (
-                                  <div className="flex items-start gap-2">
-                                    <MapPin className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                                    <span className="break-words">{directorio.direccion}</span>
+                                
+                                {/* Teléfono - solo si hay teléfono o si el usuario puede editar */}
+                                {(directorio.telefono || canEdit) && (
+                                  <div className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-slate-400 flex-shrink-0" />
+                                    <span>{directorio.telefono || 'No especificado'}</span>
                                   </div>
-                                ) : (
-                                  <span className="text-slate-400 dark:text-slate-500 italic">No especificada</span>
                                 )}
+                                
+                                {/* Dirección */}
+                                <div className="text-sm text-slate-700 dark:text-slate-300 flex items-start gap-2">
+                                  <MapPin className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                                  <span className="break-words">
+                                    {directorio.direccion || 'No especificada'}
+                                  </span>
+                                </div>
                               </div>
                             </td>
                             <td className="p-4">
