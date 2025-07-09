@@ -18,7 +18,7 @@ import { useDirectorioOIC } from "@/hooks/use-directorio-oic"
 import { useAuth } from "@/contexts/auth-context"
 import { DatabaseStatus } from "@/components/database-status"
 import { ProtectedRoute } from "@/components/protected-route"
-import { Users2, Search, Plus, MoreHorizontal, Edit, Trash2, Mail, Phone, Building2 } from "lucide-react"
+import { Users2, Search, Plus, MoreHorizontal, Edit, Trash2, Mail, Phone, Building2, MapPin } from "lucide-react"
 
 export default function DirectorioPage() {
   return (
@@ -48,7 +48,8 @@ function DirectorioPageContent() {
         directorio.nombre.toLowerCase().includes(termino) ||
         directorio.puesto.toLowerCase().includes(termino) ||
         directorio.correoElectronico.toLowerCase().includes(termino) ||
-        (directorio.telefono && directorio.telefono.toLowerCase().includes(termino))
+        (directorio.telefono && directorio.telefono.toLowerCase().includes(termino)) ||
+        (directorio.direccion && directorio.direccion.toLowerCase().includes(termino))
       )
     }
     
@@ -224,7 +225,7 @@ function DirectorioPageContent() {
               </div>
               <Input
                 type="text"
-                placeholder="Buscar por OIC, responsable, puesto, correo o teléfono..."
+                placeholder="Buscar por OIC, responsable, puesto, correo, teléfono o dirección..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border-slate-300/60 dark:border-slate-600/60 focus:border-blue-500 focus:ring-blue-500 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm"
@@ -326,6 +327,7 @@ function DirectorioPageContent() {
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Puesto</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Correo Electrónico</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Teléfono</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Dirección</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Entes Asociados</th>
                           {canEdit && (
                             <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Acciones</th>
@@ -359,6 +361,18 @@ function DirectorioPageContent() {
                                   </div>
                                 ) : (
                                   <span className="text-slate-400 dark:text-slate-500 italic">No especificado</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <div className="text-sm text-slate-700 dark:text-slate-300">
+                                {directorio.direccion ? (
+                                  <div className="flex items-start gap-2">
+                                    <MapPin className="h-4 w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                                    <span className="break-words">{directorio.direccion}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-400 dark:text-slate-500 italic">No especificada</span>
                                 )}
                               </div>
                             </td>
@@ -476,6 +490,12 @@ function DirectorioPageContent() {
                               <div className="flex items-center gap-2 text-xs sm:text-sm">
                                 <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 flex-shrink-0" />
                                 <span className="text-slate-700 dark:text-slate-300">{directorio.telefono}</span>
+                              </div>
+                            )}
+                            {directorio.direccion && (
+                              <div className="flex items-start gap-2 text-xs sm:text-sm">
+                                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                                <span className="text-slate-700 dark:text-slate-300 break-words">{directorio.direccion}</span>
                               </div>
                             )}
                           </div>
