@@ -98,7 +98,7 @@ function DirectorioPageContent() {
                   Directorio de Órganos Internos de Control
                 </h2>
                 <p className="text-muted-foreground">
-                  Administra el directorio de responsables de los OIC
+                  {canEdit ? "Administra el directorio de responsables de los OIC" : "Consulta el directorio de responsables de los OIC"}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -148,7 +148,7 @@ function DirectorioPageContent() {
                   Directorio de Órganos Internos de Control
                 </h2>
                 <p className="text-muted-foreground">
-                  Administra el directorio de responsables de los OIC
+                  {canEdit ? "Administra el directorio de responsables de los OIC" : "Consulta el directorio de responsables de los OIC"}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -199,7 +199,7 @@ function DirectorioPageContent() {
                 Directorio de Órganos Internos de Control
               </h2>
               <p className="text-sm sm:text-base text-muted-foreground">
-                Administra el directorio de responsables de los OIC
+                {canEdit ? "Administra el directorio de responsables de los OIC" : "Consulta el directorio de responsables de los OIC"}
               </p>
             </div>
             <div className="flex gap-2">
@@ -225,7 +225,10 @@ function DirectorioPageContent() {
               </div>
               <Input
                 type="text"
-                placeholder="Buscar por OIC, responsable, puesto, correo, teléfono o dirección..."
+                placeholder={canEdit 
+                  ? "Buscar por OIC, responsable, puesto, correo, teléfono o dirección..." 
+                  : "Buscar por OIC, responsable, puesto, correo o dirección..."
+                }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full border-slate-300/60 dark:border-slate-600/60 focus:border-blue-500 focus:ring-blue-500 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm"
@@ -326,7 +329,9 @@ function DirectorioPageContent() {
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Responsable</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Puesto</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Correo Electrónico</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Teléfono</th>
+                          {canEdit && (
+                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Teléfono</th>
+                          )}
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Dirección</th>
                           <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Entes Asociados</th>
                           {canEdit && (
@@ -352,18 +357,20 @@ function DirectorioPageContent() {
                                 {directorio.correoElectronico}
                               </div>
                             </td>
-                            <td className="p-4">
-                              <div className="text-sm text-slate-700 dark:text-slate-300">
-                                {directorio.telefono ? (
-                                  <div className="flex items-center gap-2">
-                                    <Phone className="h-4 w-4 text-slate-400" />
-                                    {directorio.telefono}
-                                  </div>
-                                ) : (
-                                  <span className="text-slate-400 dark:text-slate-500 italic">No especificado</span>
-                                )}
-                              </div>
-                            </td>
+                            {canEdit && (
+                              <td className="p-4">
+                                <div className="text-sm text-slate-700 dark:text-slate-300">
+                                  {directorio.telefono ? (
+                                    <div className="flex items-center gap-2">
+                                      <Phone className="h-4 w-4 text-slate-400" />
+                                      {directorio.telefono}
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-400 dark:text-slate-500 italic">No especificado</span>
+                                  )}
+                                </div>
+                              </td>
+                            )}
                             <td className="p-4">
                               <div className="text-sm text-slate-700 dark:text-slate-300">
                                 {directorio.direccion ? (
@@ -486,7 +493,7 @@ function DirectorioPageContent() {
                               <Mail className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 flex-shrink-0" />
                               <span className="text-slate-700 dark:text-slate-300 truncate">{directorio.correoElectronico}</span>
                             </div>
-                            {directorio.telefono && (
+                            {canEdit && directorio.telefono && (
                               <div className="flex items-center gap-2 text-xs sm:text-sm">
                                 <Phone className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 flex-shrink-0" />
                                 <span className="text-slate-700 dark:text-slate-300">{directorio.telefono}</span>
