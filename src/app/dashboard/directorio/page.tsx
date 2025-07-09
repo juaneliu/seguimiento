@@ -190,11 +190,11 @@ function DirectorioPageContent() {
   }
 
   return (
-    <main className="w-full">
+    <main className="w-full min-h-screen">
       <ScrollArea className="h-full">
-        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
+        <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 max-w-full overflow-x-auto">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between min-w-0">
+            <div className="min-w-0 flex-1">
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 Directorio de Órganos Internos de Control
               </h2>
@@ -202,10 +202,10 @@ function DirectorioPageContent() {
                 {canEdit ? "Administra el directorio de responsables de los OIC" : "Consulta el directorio de responsables de los OIC"}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-shrink-0">
               {canEdit && (
                 <Link href="/dashboard/directorio/crear">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
+                  <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg whitespace-nowrap">
                     <Plus className="mr-2 h-4 w-4" />
                     <span className="hidden sm:inline">Crear Registro</span>
                     <span className="sm:hidden">Crear</span>
@@ -321,21 +321,21 @@ function DirectorioPageContent() {
               ) : (
                 <>
                   {/* Vista desktop */}
-                  <div className="hidden lg:block overflow-x-auto">
-                    <table className="w-full text-sm border-collapse">
+                  <div className="hidden lg:block">
+                    <table className="w-full text-sm border-collapse table-fixed">
                       <thead>
                         <tr className="border-b border-slate-200/60 dark:border-slate-600/60">
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">OIC</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Responsable</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Puesto</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Correo Electrónico</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">OIC</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Responsable</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">Puesto</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-48">Correo Electrónico</th>
                           {canEdit && (
-                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Teléfono</th>
+                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-32">Teléfono</th>
                           )}
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Dirección</th>
-                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Entes Asociados</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Dirección</th>
+                          <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-40">Entes Asociados</th>
                           {canEdit && (
-                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Acciones</th>
+                            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 w-24">Acciones</th>
                           )}
                         </tr>
                       </thead>
