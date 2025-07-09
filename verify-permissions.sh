@@ -43,12 +43,20 @@ show_permissions() {
 
 # Función para mostrar archivos modificados
 show_modified_files() {
-    echo "📁 ARCHIVOS MODIFICADOS:"
+    echo "📁 ARCHIVOS PRINCIPALES DEL PROYECTO:"
     echo ""
-    echo "  ✅ src/components/main-nav.tsx"
-    echo "  ✅ src/components/top-nav.tsx"
-    echo "  ✅ src/app/dashboard/directorio/page.tsx"
-    echo "  ✅ src/app/dashboard/entes/page.tsx"
+    echo "  ✅ src/app/dashboard/directorio/page.tsx (tabla mejorada)"
+    echo "  ✅ src/app/dashboard/directorio/editar/[id]/page.tsx"
+    echo "  ✅ src/app/dashboard/directorio/crear/page.tsx"
+    echo "  ✅ src/lib/directorio-oic-service.ts"
+    echo "  ✅ src/hooks/use-directorio-oic.ts"
+    echo "  ✅ scripts/ (limpiado - solo archivos necesarios)"
+    echo ""
+    echo "🗑️  ARCHIVOS ELIMINADOS:"
+    echo "  ❌ Documentación temporal (*.md innecesarios)"
+    echo "  ❌ Scripts de prueba y debugging"
+    echo "  ❌ Configuraciones duplicadas"
+    echo "  ❌ Archivos de backup y temporales"
     echo ""
 }
 
