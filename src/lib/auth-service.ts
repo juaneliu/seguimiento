@@ -234,9 +234,36 @@ export class AuthService {
 
   // Eliminar usuario
   static async deleteUser(id: number): Promise<void> {
-    await prisma.usuarios.delete({
-      where: { id }
-    })
+    try {
+      // Verificar si el usuario existe
+      const user = await prisma.usuarios.findUnique({
+        where: { id },
+        include: { auditLogs: true }
+      })
+
+      if (!user) {
+        throw new Error('Usuario no encontrado')
+      }
+
+      // Usar una transacción para eliminar primero los registros de auditoría
+      await prisma.$transaction(async (tx) => {
+        // Eliminar primero todos los registros de auditoría relacionados
+        await tx.auditLogs.deleteMany({
+          where: { usuarioId: id }
+        })
+
+        // Luego eliminar el usuario
+        await tx.usuarios.delete({
+          where: { id }
+        })
+      })
+    } catch (error) {
+      console.error('Error al eliminar usuario:', error)
+      if (error instanceof Error && error.message.includes('Foreign key constraint')) {
+        throw new Error('No se puede eliminar el usuario porque tiene registros relacionados que no pueden ser eliminados')
+      }
+      throw error
+    }
   }
 
   // Cambiar estado activo/inactivo

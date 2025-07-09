@@ -170,7 +170,7 @@ export default function UsersPage() {
   const handleDeleteUser = async (id: number, email: string) => {
     const confirmed = await showConfirm(
       '¿Eliminar usuario?',
-      `¿Estás seguro de que deseas eliminar al usuario ${email}?\\n\\nEsta acción no se puede deshacer.`,
+      `¿Estás seguro de que deseas eliminar al usuario ${email}?\\n\\nEsta acción eliminará también todos los registros de auditoría asociados y no se puede deshacer.`,
       'Sí, eliminar',
       'Cancelar'
     )
@@ -180,13 +180,21 @@ export default function UsersPage() {
         const response = await apiDelete(`/api/users/${id}`)
 
         if (response.ok) {
-          await showSuccess('¡Usuario eliminado!', 'El usuario ha sido eliminado exitosamente')
+          await showSuccess('¡Usuario eliminado!', 'El usuario y sus registros asociados han sido eliminados exitosamente')
           fetchUsers()
         } else {
           const data = await response.json()
-          await showError('Error al eliminar usuario', data.error || 'Ocurrió un error inesperado')
+          let errorMessage = data.error || 'Ocurrió un error inesperado'
+          
+          // Manejar errores específicos de restricción de clave foránea
+          if (errorMessage.includes('Foreign key constraint') || errorMessage.includes('registros relacionados')) {
+            errorMessage = 'No se puede eliminar el usuario porque tiene registros importantes asociados en el sistema'
+          }
+          
+          await showError('Error al eliminar usuario', errorMessage)
         }
       } catch (error) {
+        console.error('Error eliminando usuario:', error)
         await showError('Error de conexión', 'No se pudo conectar con el servidor')
       }
     }
