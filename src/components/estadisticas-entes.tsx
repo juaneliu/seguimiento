@@ -101,7 +101,7 @@ export function EstadisticasEntes() {
             <CardTitle className="text-xs sm:text-sm font-medium">Total de Entes</CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-            <div className="text-base sm:text-xl md:text-2xl font-bold">{stats.total}</div>
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">{stats.total}</div>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
               Sujetos obligados registrados
             </p>
@@ -119,7 +119,7 @@ export function EstadisticasEntes() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-            <div className="text-base sm:text-xl md:text-2xl font-bold" style={{ color: AMBITO_COLORS['Estatal'] }}>
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold" style={{ color: AMBITO_COLORS['Estatal'] }}>
               {stats.porAmbito['Estatal'] || 0}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -139,7 +139,7 @@ export function EstadisticasEntes() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 md:p-6 pt-0">
-            <div className="text-base sm:text-xl md:text-2xl font-bold" style={{ color: AMBITO_COLORS['Municipal'] }}>
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold" style={{ color: AMBITO_COLORS['Municipal'] }}>
               {stats.porAmbito['Municipal'] || 0}
             </div>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
@@ -220,16 +220,16 @@ export function EstadisticasEntes() {
                     top: 10, 
                     right: 10, 
                     left: 10, 
-                    bottom: 40 
+                    bottom: 20 
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                   <XAxis 
                     dataKey="name" 
-                    fontSize={10}
-                    angle={-45}
-                    textAnchor="end"
-                    height={60}
+                    fontSize={12}
+                    angle={0}
+                    textAnchor="middle"
+                    height={40}
                     interval={0}
                   />
                   <YAxis fontSize={10} />
