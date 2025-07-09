@@ -151,15 +151,15 @@ function EntesPageContent() {
         <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
           {/* Header responsive */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight">
                 Entes Públicos
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Gestiona y administra los entes públicos del estado
               </p>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-2 sm:flex-shrink-0">
               {canEdit && (
                 <>
                   <Link href="/dashboard/entes/importar">
@@ -184,21 +184,21 @@ function EntesPageContent() {
           <DatabaseStatus />
           
           {/* Navegación - Pestañas Responsivas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <button
               onClick={() => setActiveView('sujetos-obligados')}
-              className={`p-3 sm:p-4 md:p-6 rounded-xl transition-all duration-300 border-2 ${
+              className={`p-3 sm:p-4 lg:p-6 rounded-xl transition-all duration-300 border-2 ${
                 activeView === 'sujetos-obligados'
                   ? 'bg-gradient-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/40 dark:from-blue-900/20 dark:via-indigo-900/15 dark:to-purple-900/10 border-blue-300/80 dark:border-blue-600/80 shadow-xl backdrop-blur-sm ring-2 ring-blue-200/50'
                   : 'bg-gradient-to-br from-white/70 via-slate-50/60 to-gray-50/40 dark:from-slate-800/70 dark:via-slate-700/60 dark:to-slate-600/40 border-slate-200/60 dark:border-slate-600/60 shadow-lg backdrop-blur-sm hover:border-blue-200/60'
               }`}
             >
-              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                <div className="p-2 sm:p-2.5 md:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg flex-shrink-0">
-                  <Users className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
+                <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg flex-shrink-0">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <h3 className="font-semibold text-xs sm:text-sm md:text-base bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent truncate">
+                  <h3 className="font-semibold text-xs sm:text-sm lg:text-base bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent truncate">
                     Sujetos Obligados
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
@@ -210,18 +210,18 @@ function EntesPageContent() {
 
             <button
               onClick={() => setActiveView('autoridades-resolutoras')}
-              className={`p-3 sm:p-4 md:p-6 rounded-xl transition-all duration-300 border-2 ${
+              className={`p-3 sm:p-4 lg:p-6 rounded-xl transition-all duration-300 border-2 ${
                 activeView === 'autoridades-resolutoras'
                   ? 'bg-gradient-to-br from-green-50/80 via-emerald-50/60 to-teal-50/40 dark:from-green-900/20 dark:via-emerald-900/15 dark:to-teal-900/10 border-green-300/80 dark:border-green-600/80 shadow-xl backdrop-blur-sm ring-2 ring-green-200/50'
                   : 'bg-gradient-to-br from-white/70 via-slate-50/60 to-gray-50/40 dark:from-slate-800/70 dark:via-slate-700/60 dark:to-slate-600/40 border-slate-200/60 dark:border-slate-600/60 shadow-lg backdrop-blur-sm hover:border-green-200/60'
               }`}
             >
-              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-                <div className="p-2 sm:p-2.5 md:p-3 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg flex-shrink-0">
-                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+              <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
+                <div className="p-2 sm:p-2.5 lg:p-3 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg flex-shrink-0">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
                 </div>
                 <div className="text-left flex-1 min-w-0">
-                  <h3 className="font-semibold text-xs sm:text-sm md:text-base bg-gradient-to-r from-green-700 via-emerald-700 to-teal-700 dark:from-green-400 dark:via-emerald-400 dark:to-teal-400 bg-clip-text text-transparent truncate">
+                  <h3 className="font-semibold text-xs sm:text-sm lg:text-base bg-gradient-to-r from-green-700 via-emerald-700 to-teal-700 dark:from-green-400 dark:via-emerald-400 dark:to-teal-400 bg-clip-text text-transparent truncate">
                     Autoridades Resolutoras
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">
@@ -240,7 +240,7 @@ function EntesPageContent() {
                 placeholder="Buscar entes por nombre, poder, ámbito..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 shadow-sm"
+                className="pl-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 shadow-sm text-sm sm:text-base"
               />
             </div>
             {searchTerm && (
@@ -248,7 +248,7 @@ function EntesPageContent() {
                 variant="outline"
                 size="sm"
                 onClick={limpiarBusqueda}
-                className="w-full sm:w-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 shadow-sm"
+                className="w-full sm:w-auto bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 shadow-sm text-sm"
               >
                 Limpiar
               </Button>
@@ -257,14 +257,14 @@ function EntesPageContent() {
           
           {/* Resultados de búsqueda */}
           {searchTerm && (
-            <div className="text-sm text-slate-600 dark:text-slate-400 px-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-lg p-3 border border-slate-200/60 dark:border-slate-600/60">
+            <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 px-3 sm:px-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-lg p-3 border border-slate-200/60 dark:border-slate-600/60">
               {sujetosObligados.length + autoridadesResolutoras.length > 0 ? (
                 <>
-                  Mostrando {sujetosObligados.length + autoridadesResolutoras.length} resultado(s) para "{searchTerm}"
+                  Mostrando <span className="font-medium">{sujetosObligados.length + autoridadesResolutoras.length}</span> resultado(s) para "<span className="font-medium">{searchTerm}</span>"
                 </>
               ) : (
                 <>
-                  No se encontraron resultados para "{searchTerm}"
+                  No se encontraron resultados para "<span className="font-medium">{searchTerm}</span>"
                 </>
               )}
             </div>
@@ -277,21 +277,21 @@ function EntesPageContent() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-200/20 via-indigo-200/20 to-purple-200/20 dark:from-blue-800/10 dark:via-indigo-800/10 dark:to-purple-800/10 rounded-full blur-3xl -z-10"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-200/20 via-blue-200/20 to-cyan-200/20 dark:from-indigo-800/10 dark:via-blue-800/10 dark:to-cyan-800/10 rounded-full blur-2xl -z-10"></div>
                 
-                <CardHeader className="relative z-10 border-b border-slate-200/60 dark:border-slate-600/60 pb-6 bg-gradient-to-r from-white/50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-700/50 backdrop-blur-sm">
-                  <CardTitle className="flex items-center gap-3 text-xl text-slate-800 dark:text-slate-100">
-                    <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                      <Users className="h-6 w-6 text-white" />
+                <CardHeader className="relative z-10 border-b border-slate-200/60 dark:border-slate-600/60 pb-4 sm:pb-6 bg-gradient-to-r from-white/50 to-blue-50/50 dark:from-slate-800/50 dark:to-slate-700/50 backdrop-blur-sm">
+                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl text-slate-800 dark:text-slate-100">
+                    <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                      <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                     </div>
                     <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent font-bold">
                       Sujetos Obligados ({sujetosObligados.length})
                     </span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6 relative z-10">
+                <CardContent className="pt-4 sm:pt-6 relative z-10">
                   {sujetosObligados.length === 0 ? (
-                    <div className="text-center py-8">
-                      <Users className="h-16 w-16 mx-auto mb-4 text-slate-400" />
-                      <p className="text-slate-600">No hay sujetos obligados registrados aún.</p>
+                    <div className="text-center py-6 sm:py-8">
+                      <Users className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-3 sm:mb-4 text-slate-400" />
+                      <p className="text-sm sm:text-base text-slate-600">No hay sujetos obligados registrados aún.</p>
                     </div>
                   ) : (
                     <TablaSujetosObligados entes={sujetosObligados} onEliminar={handleEliminarEnte} canEdit={canEdit} />
@@ -342,70 +342,70 @@ const TablaSujetosObligados = ({ entes, onEliminar, canEdit }: { entes: any[], o
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="border-b border-slate-200/60 dark:border-slate-600/60">
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Nombre</th>
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Tipo</th>
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Nivel</th>
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S1</th>
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S2</th>
-            <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S6</th>
+            <th className="text-left p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Nombre</th>
+            <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Tipo</th>
+            <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Nivel</th>
+            <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S1</th>
+            <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S2</th>
+            <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">S6</th>
             {canEdit && (
-              <th className="text-center p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Acciones</th>
+              <th className="text-center p-3 lg:p-4 font-semibold bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200">Acciones</th>
             )}
           </tr>
         </thead>
         <tbody>
           {entes.map((ente) => (
-            <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60">
-              <td className="p-4">
+            <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
+              <td className="p-3 lg:p-4">
                 <div>
-                  <div className="font-medium text-slate-900 dark:text-slate-100">{ente.nombre}</div>
+                  <div className="font-medium text-sm lg:text-base text-slate-900 dark:text-slate-100">{ente.nombre}</div>
                   {ente.municipio && (
-                    <div className="text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
+                    <div className="text-xs lg:text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
                   )}
                   <div className="text-xs text-slate-500 dark:text-slate-500">{ente.entidad.nombre}</div>
                 </div>
               </td>
-              <td className="p-4 text-center">
-                <div className="text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
+              <td className="p-3 lg:p-4 text-center">
+                <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
               </td>
-              <td className="p-4 text-center">
-                <div className="text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
+              <td className="p-3 lg:p-4 text-center">
+                <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
               </td>
-              <td className="p-4 text-center">
+              <td className="p-3 lg:p-4 text-center">
                 {ente.sistema1 ? (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
+                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
                   </div>
                 ) : (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-4 w-4 text-red-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
+                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
                   </div>
                 )}
               </td>
-              <td className="p-4 text-center">
+              <td className="p-3 lg:p-4 text-center">
                 {ente.sistema2 ? (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
+                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
                   </div>
                 ) : (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-4 w-4 text-red-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
+                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
                   </div>
                 )}
               </td>
-              <td className="p-4 text-center">
+              <td className="p-3 lg:p-4 text-center">
                 {ente.sistema6 ? (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
+                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
                   </div>
                 ) : (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-4 w-4 text-red-600" />
+                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
+                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
                   </div>
                 )}
               </td>
               {canEdit && (
-                <td className="p-4 text-center">
+                <td className="p-3 lg:p-4 text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-700">
