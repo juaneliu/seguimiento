@@ -121,9 +121,12 @@ export function TableroAcuerdos() {
     }
 
     return filtered.sort((a, b) => {
-      const fechaA = a.fechaActualizacion ? new Date(a.fechaActualizacion).getTime() : 0
-      const fechaB = b.fechaActualizacion ? new Date(b.fechaActualizacion).getTime() : 0
-      return fechaB - fechaA
+      // IMPORTANTE: Ordenar por fecha de creación (más antiguo primero) para mantener 
+      // el orden de captura original y asegurar que la numeración sea consistente
+      // sin importar las modificaciones posteriores
+      const fechaA = a.fechaCreacion ? new Date(a.fechaCreacion).getTime() : 0
+      const fechaB = b.fechaCreacion ? new Date(b.fechaCreacion).getTime() : 0
+      return fechaA - fechaB
     })
   }
 
@@ -138,6 +141,17 @@ export function TableroAcuerdos() {
         groups[key] = []
       }
       groups[key].push(acuerdo)
+    })
+    
+    // Ordenar los acuerdos dentro de cada grupo por fecha de creación
+    // IMPORTANTE: Este ordenamiento asegura que la numeración de acuerdos dentro de cada sesión
+    // respete el orden cronológico de creación, no de modificación
+    Object.keys(groups).forEach(key => {
+      groups[key].sort((a, b) => {
+        const fechaA = a.fechaCreacion ? new Date(a.fechaCreacion).getTime() : 0
+        const fechaB = b.fechaCreacion ? new Date(b.fechaCreacion).getTime() : 0
+        return fechaA - fechaB
+      })
     })
     
     return groups
@@ -156,7 +170,12 @@ export function TableroAcuerdos() {
     
     // Si itemsPerPage es -1, mostrar todos
     if (itemsPerPage === -1) {
-      return { paginatedGroups: allGroups, totalItems }
+      // Para mostrar todos, también necesitamos calcular los índices de inicio
+      const allGroupStartIndexes: { [key: string]: number } = {}
+      for (const [sessionKey] of groupEntries) {
+        allGroupStartIndexes[sessionKey] = 0
+      }
+      return { paginatedGroups: allGroups, totalItems, groupStartIndexes: allGroupStartIndexes }
     }
     
     // Aplicar paginación a nivel de acuerdos individuales
@@ -165,6 +184,7 @@ export function TableroAcuerdos() {
     
     let currentCount = 0
     const paginatedGroups: { [key: string]: AcuerdoSeguimiento[] } = {}
+    const groupStartIndexes: { [key: string]: number } = {}
     
     for (const [sessionKey, acuerdos] of groupEntries) {
       const sessionStartIndex = currentCount
@@ -177,17 +197,19 @@ export function TableroAcuerdos() {
         
         if (groupStartIndex < groupEndIndex) {
           paginatedGroups[sessionKey] = acuerdos.slice(groupStartIndex, groupEndIndex)
+          // Guardar el índice de inicio del grupo para la numeración correcta
+          groupStartIndexes[sessionKey] = groupStartIndex
         }
       }
       
       currentCount += acuerdos.length
     }
     
-    return { paginatedGroups, totalItems }
+    return { paginatedGroups, totalItems, groupStartIndexes }
   }
 
   // Calcular información de paginación
-  const { paginatedGroups, totalItems } = getPaginatedGroups()
+  const { paginatedGroups, totalItems, groupStartIndexes } = getPaginatedGroups()
   const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage)
 
   // Función para cambiar página
@@ -669,8 +691,10 @@ export function TableroAcuerdos() {
                           {/* Filas de acuerdos del grupo */}
                           {acuerdosGroup.map((acuerdo, acuerdoIndex) => {
                             const diasInfo = diasRestantes(acuerdo.fechaCompromiso)
-                            // Número consecutivo dentro de la sesión con formato de dos dígitos
-                            const numeroFormateado = (acuerdoIndex + 1).toString().padStart(2, '0')
+                            // Número consecutivo dentro de la sesión considerando la paginación
+                            const startIndex = groupStartIndexes?.[sessionKey] || 0
+                            const numeroAbsoluto = startIndex + acuerdoIndex + 1
+                            const numeroFormateado = numeroAbsoluto.toString().padStart(2, '0')
                             
                             return (
                               <tr key={acuerdo.id} className="border-b border-slate-200/40 dark:border-slate-600/40 cursor-pointer" onClick={() => openDetails(acuerdo)}>
@@ -772,7 +796,10 @@ export function TableroAcuerdos() {
                         <div className="space-y-3 p-3">
                           {acuerdosGroup.map((acuerdo, acuerdoIndex) => {
                             const diasInfo = diasRestantes(acuerdo.fechaCompromiso)
-                            const numeroFormateado = (acuerdoIndex + 1).toString().padStart(2, '0')
+                            // Número consecutivo dentro de la sesión considerando la paginación
+                            const startIndex = groupStartIndexes?.[sessionKey] || 0
+                            const numeroAbsoluto = startIndex + acuerdoIndex + 1
+                            const numeroFormateado = numeroAbsoluto.toString().padStart(2, '0')
                             
                             return (
                               <div 
