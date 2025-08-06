@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Users, Notebook, FileText, Calendar, UserCircle } from "lucide-react"
+import { LayoutDashboard, Users, Notebook, FileText, Calendar, UserCircle, Building2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 
 interface NavItem {

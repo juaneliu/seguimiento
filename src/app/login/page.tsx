@@ -16,11 +16,27 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [totalEntes, setTotalEntes] = useState(145) // Valor por defecto mientras carga
   const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
+    // Obtener estadísticas reales al cargar la página
+    loadStatistics()
   }, [])
+
+  const loadStatistics = async () => {
+    try {
+      const response = await fetch('/api/entes/statistics')
+      if (response.ok) {
+        const stats = await response.json()
+        setTotalEntes(stats.total || 145)
+      }
+    } catch (error) {
+      console.error('Error loading statistics:', error)
+      // Si falla, mantener el valor por defecto
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -144,7 +160,7 @@ export default function LoginPage() {
                     <div className="p-1.5 sm:p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                       <Building2 className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <div className="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">154+</div>
+                    <div className="text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-slate-100">{totalEntes}</div>
                   </div>
                   <div className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">Entes Públicos</div>
                   <div className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Bajo seguimiento</div>

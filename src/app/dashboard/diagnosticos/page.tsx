@@ -32,7 +32,8 @@ import {
   Save,
   RefreshCw,
   Eye,
-  Loader2
+  Loader2,
+  Activity
 } from "lucide-react"
 import { showError, showSuccess, showConfirm } from "@/lib/notifications"
 import { useDiagnosticosMunicipales } from "@/hooks/use-diagnosticos-municipales"
@@ -465,19 +466,96 @@ function DiagnosticosMunicipiosContent() {
                 <div className="space-y-4">
                   {/* Gráficos de estadísticas - usando estilos de Acuerdos con gradientes y efectos */}
               {canEdit && (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {/* Gráfico circular de progreso */}
+                <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2">
+                  {/* Gráfico circular de progreso con selector temporal */}
                   <Card className="bg-gradient-to-br from-white via-slate-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 via-indigo-200/20 to-purple-200/20 dark:from-blue-800/10 dark:via-indigo-800/10 dark:to-purple-800/10 rounded-full blur-3xl -z-10"></div>
                   <CardHeader className="relative z-10 pb-2">
-                    <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
-                      <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                        <TrendingUp className="h-4 w-4 text-white" />
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
+                        <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+                          <TrendingUp className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent font-bold">
+                          Progreso Global
+                        </span>
+                      </CardTitle>
+                      
+                      {/* Selector de período temporal */}
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
+                            filtros.trimestre === 'todos' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
+                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
+                          }`}
+                          onClick={() => aplicarFiltroTrimestre('todos')}
+                        >
+                          Total
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
+                            filtros.trimestre === 'Q1' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
+                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
+                          }`}
+                          onClick={() => aplicarFiltroTrimestre('Q1')}
+                        >
+                          Q1
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
+                            filtros.trimestre === 'Q2' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
+                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
+                          }`}
+                          onClick={() => aplicarFiltroTrimestre('Q2')}
+                        >
+                          Q2
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
+                            filtros.trimestre === 'Q3' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
+                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
+                          }`}
+                          onClick={() => aplicarFiltroTrimestre('Q3')}
+                        >
+                          Q3
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
+                            filtros.trimestre === 'Q4' 
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
+                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
+                          }`}
+                          onClick={() => aplicarFiltroTrimestre('Q4')}
+                        >
+                          Q4
+                        </Button>
                       </div>
-                      <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent font-bold">
-                        Progreso Global
-                      </span>
-                    </CardTitle>
+                    </div>
+                    
+                    {/* Indicador del período activo */}
+                    <div className="mt-2">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {filtros.trimestre === 'todos' ? 'Mostrando datos de todo el año 2025' :
+                         filtros.trimestre === 'Q1' ? 'Primer trimestre 2025 (Ene-Mar)' :
+                         filtros.trimestre === 'Q2' ? 'Segundo trimestre 2025 (Abr-Jun)' :
+                         filtros.trimestre === 'Q3' ? 'Tercer trimestre 2025 (Jul-Sep)' :
+                         'Cuarto trimestre 2025 (Oct-Dic)'}
+                      </p>
+                    </div>
                   </CardHeader>
                   <CardContent className="relative z-10 pt-2">
                     <div className="flex items-center gap-6">
@@ -501,7 +579,7 @@ function DiagnosticosMunicipiosContent() {
                               stroke="url(#gradient1)"
                               strokeWidth="10"
                               fill="transparent"
-                              strokeDasharray={`${((estadisticas.completados + estadisticas.enProceso * 0.5) / estadisticas.totalMunicipios) * 439.82} 439.82`}
+                              strokeDasharray={`${((estadisticasFiltradas.completados + estadisticasFiltradas.enProceso * 0.5) / estadisticas.totalMunicipios) * 439.82} 439.82`}
                             />
                             <defs>
                               <linearGradient id="gradient1">
@@ -513,9 +591,11 @@ function DiagnosticosMunicipiosContent() {
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="text-center">
                               <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                {Math.round(((estadisticas.completados + estadisticas.enProceso * 0.5) / estadisticas.totalMunicipios) * 100)}%
+                                {Math.round(((estadisticasFiltradas.completados + estadisticasFiltradas.enProceso * 0.5) / estadisticas.totalMunicipios) * 100)}%
                               </div>
-                              <div className="text-base text-gray-500 font-medium">Avance</div>
+                              <div className="text-base text-gray-500 font-medium">
+                                {filtros.trimestre === 'todos' ? 'Avance Total' : `Avance ${filtros.trimestre}`}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -525,15 +605,79 @@ function DiagnosticosMunicipiosContent() {
                       <div className="flex flex-col space-y-3 min-w-[120px]">
                         <div className="flex flex-col items-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
                           <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Completados</span>
-                          <span className="text-xl font-bold text-emerald-700 dark:text-emerald-300">{estadisticas.completados}</span>
+                          <span className="text-xl font-bold text-emerald-700 dark:text-emerald-300">{estadisticasFiltradas.completados}</span>
                         </div>
                         <div className="flex flex-col items-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                           <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">En Proceso</span>
-                          <span className="text-xl font-bold text-amber-700 dark:text-amber-300">{estadisticas.enProceso}</span>
+                          <span className="text-xl font-bold text-amber-700 dark:text-amber-300">{estadisticasFiltradas.enProceso}</span>
                         </div>
                         <div className="flex flex-col items-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
                           <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">Pendientes</span>
-                          <span className="text-xl font-bold text-rose-700 dark:text-rose-300">{estadisticas.pendientes}</span>
+                          <span className="text-xl font-bold text-rose-700 dark:text-rose-300">{estadisticasFiltradas.pendientes}</span>
+                        </div>
+                        
+                        {/* Información adicional del período */}
+                        <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                          <div className="text-xs text-slate-600 dark:text-slate-400 text-center">
+                            <div className="font-medium">Total período</div>
+                            <div className="text-sm font-bold text-slate-800 dark:text-slate-200">{estadisticasFiltradas.total}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Card de Comparativa Temporal */}
+                <Card className="bg-gradient-to-br from-white via-slate-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-indigo-200/20 via-blue-200/20 to-cyan-200/20 dark:from-indigo-800/10 dark:via-blue-800/10 dark:to-cyan-800/10 rounded-full blur-3xl -z-10"></div>
+                  <CardHeader className="relative z-10 pb-2">
+                    <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
+                      <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg shadow-lg">
+                        <Activity className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="bg-gradient-to-r from-indigo-700 via-blue-700 to-cyan-700 dark:from-indigo-400 dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent font-bold">
+                        Tendencia Temporal
+                      </span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative z-10 pt-2">
+                    <div className="space-y-3">
+                      {/* Métricas de tendencia */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                          <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">Promedio Período</div>
+                          <div className="text-lg font-bold text-blue-700 dark:text-blue-300">
+                            {estadisticasFiltradas.total > 0 ? estadisticasFiltradas.promedioGeneral.toFixed(1) : '0'}%
+                          </div>
+                        </div>
+                        <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                          <div className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Efectividad</div>
+                          <div className="text-lg font-bold text-indigo-700 dark:text-indigo-300">
+                            {estadisticasFiltradas.total > 0 ? Math.round((estadisticasFiltradas.completados / estadisticasFiltradas.total) * 100) : 0}%
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Indicador de progreso temporal */}
+                      <div className="mt-3">
+                        <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                          <span>Progreso del período</span>
+                          <span>{estadisticasFiltradas.total} diagnósticos</span>
+                        </div>
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                          <div 
+                            className="bg-gradient-to-r from-indigo-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+                            style={{ 
+                              width: `${estadisticas.totalMunicipios > 0 ? Math.min(100, (estadisticasFiltradas.total / estadisticas.totalMunicipios) * 100) : 0}%` 
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-center">
+                          {filtros.trimestre === 'todos' ? 
+                            'Cobertura general de municipios' : 
+                            `Actividad en ${filtros.trimestre} vs total de municipios`
+                          }
                         </div>
                       </div>
                     </div>
