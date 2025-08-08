@@ -8,8 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { ChevronRight, Plus, Trash2, Upload } from "lucide-react"
 import { showError, showSuccess, showMissingFieldsError, showUrlValidationError, showLoadingAlert, closeLoadingAlert } from "@/lib/notifications"
-import { MUNICIPIOS_MORELOS } from "@/lib/prisma-service"
-import { useDiagnosticosMunicipales } from "@/hooks/use-diagnosticos-municipales"
+import { useDiagnosticosEntes } from "@/hooks/use-diagnosticos-entes"
 import { cn } from "@/lib/utils"
 import { ProtectedRoute } from "@/components/protected-route"
 
@@ -32,30 +31,100 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 
+// Lista de entes públicos de Morelos
+const ENTES_PUBLICOS_MORELOS = [
+  "Aeropuerto de Cuernavaca S.A. de C.V.",
+  "Centro de Conciliación Laboral del Estado de Morelos",
+  "Centro Estatal de Prevención Social de la Violencia y la Delincuencia con Participación Ciudadana",
+  "Centro Morelense de las Artes",
+  "Colegio de Bachilleres del Estado de Morelos",
+  "Colegio de Estudios Científicos y Tecnológicos del Estado de Morelos",
+  "Colegio Nacional de Educación Profesional Técnica del Estado de Morelos",
+  "Comisión de Búsqueda de Personas del Estado de Morelos",
+  "Comisión Ejecutiva de Atención y Reparación a Víctimas del Estado de Morelos",
+  "Comisión Estatal de Arbitraje Médico del Estado de Morelos",
+  "Comisión Estatal de Biodiversidad",
+  "Comisión Estatal de Evaluación del Desarrollo Social",
+  "Comisión Estatal de Mejora Regulatoria",
+  "Comisión Estatal de Reservas Territoriales",
+  "Comisión Estatal del Agua",
+  "Consejería Jurídica",
+  "Consejo de Ciencia y Tecnología del Estado de Morelos",
+  "Coordinación Estatal de Protección Civil de Morelos",
+  "Coordinación Estatal del Subsistema de Preparatoria Abierta",
+  "Coordinación General de Movilidad y Transporte",
+  "Fideicomiso Balneario Agua Hedionda",
+  "Fideicomiso Centro Cultural Teopanzolco",
+  "Fideicomiso Centro de Congresos y Convenciones Morelos",
+  "Fideicomiso del Fondo de Competitividad y Promoción del Empleo",
+  "Fideicomiso Fondo Desarrollo Empresarial y Promoción de la Inversión",
+  "Fideicomiso Impulso Financiero al Campo Morelense",
+  "Fideicomiso Lago de Tequesquitengo",
+  "Fideicomiso Museo Morelense de Arte Contemporáneo Juan Soriano",
+  "Fideicomiso Parque Científico y Tecnológico Morelos",
+  "Fideicomiso Turismo Morelos",
+  "Fondo de Fomento Agropecuario del Estado de Morelos",
+  "Fondo Estatal para la Administración y Operación del recinto Deportivo \"Agustín Coruco Díaz\"",
+  "Fondo Estatal para la Promoción y Desarrollo de Eventos Vinculados con la Cultura y el Turismo",
+  "Hospital del Niño Morelense",
+  "Instituto de Capacitación para el Trabajo del Estado de Morelos",
+  "Instituto de Crédito para los Trabajadores al Servicio del Gobierno del Estado de Morelos",
+  "Instituto de Desarrollo y Fortalecimiento Municipal del Estado de Morelos",
+  "Instituto de Educación Básica del Estado de Morelos",
+  "Instituto de la Defensoría Publica del Estado de Morelos",
+  "Instituto de los Pueblos y Comunidades Indígenas y Afromexicanas de Morelos",
+  "Instituto de Servicios Registrales y Catastrales del Estado de Morelos",
+  "Instituto del Deporte y Cultura Física del Estado de Morelos",
+  "Instituto Estatal de Documentación del Estado de Morelos",
+  "Instituto Estatal de Educación para Adultos",
+  "Instituto Estatal de Infraestructura Educativa",
+  "Instituto Morelense de las Personas Adolescentes y Jóvenes",
+  "Instituto Morelense de Radio y Televisión",
+  "Instituto Morelense para el Financiamiento del Sector Productivo",
+  "Instituto Pro-Veteranos de la Revolución del Sur",
+  "Junta Local de Conciliación y Arbitraje del Estado de Morelos",
+  "Museo Morelense de Arte Popular",
+  "Oficina de la Gubernatura del Estado",
+  "Operador de Carreteras de Cuota",
+  "Procuraduría de Protección al Ambiente del Estado de Morelos",
+  "Secretaría de Administración",
+  "Secretaría de Bienestar",
+  "Secretaría de Cultura",
+  "Secretaría de Desarrollo Agropecuario",
+  "Secretaría de Desarrollo Económico y del Trabajo",
+  "Secretaría de Desarrollo Sustentable",
+  "Secretaría de Educación",
+  "Secretaría de Gobierno",
+  "Secretaría de Hacienda",
+  "Secretaría de Infraestructura",
+  "Secretaría de la Contraloría",
+  "Secretaría de las Mujeres",
+  "Secretaría de Salud",
+  "Secretaría de Seguridad y Protección Ciudadana",
+  "Secretaría de Turismo",
+  "Secretaria Ejecutiva del Sistema Anticorrupción del Estado de Morelos",
+  "Secretaría Ejecutiva del Sistema de Protección Integral de Niñas, Niños y Adolescentes del Estado de Morelos",
+  "Secretariado Ejecutivo del Sistema Estatal de Seguridad Pública",
+  "Servicios de Salud Morelos",
+  "Sistema para el Desarrollo Integral de la Familia del Estado de Morelos",
+  "Tribunal Estatal de Conciliación y Arbitraje del Estado de Morelos",
+  "Universidad Politécnica del Estado de Morelos",
+  "Universidad Tecnológica del Sur del Estado de Morelos",
+  "Universidad Tecnológica Emiliano Zapata"
+].sort()
+
 // Schema de validación
 const formSchema = z.object({
   nombreActividad: z.string().min(2, "El nombre de la actividad debe tener al menos 2 caracteres"),
-  diagnosticoUrl: z.string()
-    .optional()
-    .refine((val) => {
-      if (!val || val.trim() === "") return true; // Permitir vacío
-      const trimmedVal = val.trim();
-      try {
-        new URL(trimmedVal);
-        return trimmedVal.startsWith('http://') || trimmedVal.startsWith('https://');
-      } catch {
-        return false;
-      }
-    }, "Debe ser una URL válida que comience con http:// o https://"),
-  municipio: z.string().min(1, "Selecciona un ente público"),
+  entePublico: z.string().min(1, "Selecciona un ente público").optional().refine(val => val && val.trim().length > 0, "Selecciona un ente público"),
+  actividad: z.enum(["Diagnóstico", "Indicador", "Índice"], {
+    required_error: "Selecciona un tipo de actividad",
+  }),
   poder: z.enum(["Ejecutivo", "Legislativo", "Judicial", "Autónomo"], {
     required_error: "Selecciona un poder",
   }),
   organo: z.enum(["Central", "Descentralizado", "Desconcentrado", "No sectorizado"], {
     required_error: "Selecciona un órgano",
-  }),
-  actividad: z.enum(["Diagnóstico", "Indicador", "Índice"], {
-    required_error: "Selecciona un tipo de actividad",
   }),
   solicitudUrl: z.string()
     .optional()
@@ -81,6 +150,18 @@ const formSchema = z.object({
         return false;
       }
     }, "Debe ser una URL válida que comience con http:// o https://"),
+  diagnosticoUrl: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val || val.trim() === "") return true; // Permitir vacío
+      const trimmedVal = val.trim();
+      try {
+        new URL(trimmedVal);
+        return trimmedVal.startsWith('http://') || trimmedVal.startsWith('https://');
+      } catch {
+        return false;
+      }
+    }, "Debe ser una URL válida que comience con http:// o https://"),
   unidadAdministrativa: z.string().min(2, "La unidad administrativa debe tener al menos 2 caracteres"),
   evaluacion: z.number().min(0, "La evaluación debe ser mayor o igual a 0").max(100, "La evaluación debe ser menor o igual a 100"),
   observaciones: z.string().optional(),
@@ -90,8 +171,8 @@ type FormData = z.infer<typeof formSchema>
 
 interface Accion {
   id: string
-  descripcion: string // Ahora será "Invitación", "Exhorto", "Recomendación", "ESAF"
-  urlAccion: string   // Antes era "responsable", ahora es URL de Acción (PDF)
+  descripcion: 'Invitación' | 'Exhorto' | 'Recomendación' | 'ESAF' // Valores específicos
+  urlAccion: string   // URL de Acción (PDF)
   urlRespuesta?: string // URL de respuesta de Acción (PDF) - aparece cuando está completada
   fechaLimite: string
   completada: boolean
@@ -103,9 +184,9 @@ const generateAccionId = (): string => {
   return `accion-${++accionIdCounter}-${Date.now()}`
 }
 
-export default function CrearDiagnosticoPage() {
+export default function CrearDiagnosticoEntePage() {
   const router = useRouter()
-  const { createDiagnostico } = useDiagnosticosMunicipales()
+  const { createDiagnostico } = useDiagnosticosEntes()
   const [acciones, setAcciones] = useState<Accion[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -113,21 +194,18 @@ export default function CrearDiagnosticoPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       nombreActividad: "",
-      diagnosticoUrl: "",
-      municipio: "",
+      entePublico: undefined, // Cambiado de "" a undefined
+      actividad: undefined,
       poder: undefined,
       organo: undefined,
-      actividad: undefined, // Revertir a undefined pero manejar en el Select
       solicitudUrl: "",
       respuestaUrl: "",
+      diagnosticoUrl: "",
       unidadAdministrativa: "",
       evaluacion: 0,
       observaciones: "",
     },
   })
-
-  // Sincronizar el estado del formulario (ya no necesario para municipios múltiples)
-  // Eliminado el useEffect anterior
 
   // Función para limpiar errores cuando el usuario comience a escribir
   const clearFieldError = (fieldName: keyof FormData) => {
@@ -139,7 +217,7 @@ export default function CrearDiagnosticoPage() {
   const agregarAccion = () => {
     const nuevaAccion: Accion = {
       id: generateAccionId(),
-      descripcion: '',
+      descripcion: 'Invitación' as const, // Asegurar tipo literal
       urlAccion: '',
       urlRespuesta: '',
       fechaLimite: '',
@@ -154,7 +232,10 @@ export default function CrearDiagnosticoPage() {
 
   const actualizarAccion = (id: string, campo: keyof Accion, valor: string | boolean) => {
     setAcciones(prev => prev.map(accion =>
-      accion.id === id ? { ...accion, [campo]: valor } : accion
+      accion.id === id ? { 
+        ...accion, 
+        [campo]: campo === 'descripcion' ? (valor as 'Invitación' | 'Exhorto' | 'Recomendación' | 'ESAF') : valor 
+      } : accion
     ))
   }
 
@@ -185,29 +266,11 @@ export default function CrearDiagnosticoPage() {
     }
     
     // Validar Ente Público
-    if (!values.municipio || values.municipio.trim() === "") {
+    if (!values.entePublico || values.entePublico.trim() === "") {
       missingFields.push("Ente Público")
-      form.setError("municipio", {
+      form.setError("entePublico", {
         type: "manual",
         message: "Selecciona un ente público"
-      })
-    }
-
-    // Validar Poder
-    if (!values.poder) {
-      missingFields.push("Poder")
-      form.setError("poder", {
-        type: "manual",
-        message: "Selecciona un poder"
-      })
-    }
-
-    // Validar Órgano
-    if (!values.organo) {
-      missingFields.push("Órgano")
-      form.setError("organo", {
-        type: "manual",
-        message: "Selecciona un órgano"
       })
     }
     
@@ -217,6 +280,24 @@ export default function CrearDiagnosticoPage() {
       form.setError("actividad", {
         type: "manual",
         message: "El tipo de actividad es obligatorio"
+      })
+    }
+    
+    // Validar Poder
+    if (!values.poder) {
+      missingFields.push("Poder")
+      form.setError("poder", {
+        type: "manual",
+        message: "Selecciona un poder"
+      })
+    }
+    
+    // Validar Órgano
+    if (!values.organo) {
+      missingFields.push("Órgano")
+      form.setError("organo", {
+        type: "manual",
+        message: "Selecciona un órgano"
       })
     }
     
@@ -241,55 +322,66 @@ export default function CrearDiagnosticoPage() {
       }
     }
 
-    // Validar URL de diagnóstico
-    if (values.diagnosticoUrl && !validateUrl(values.diagnosticoUrl, "URL de Diagnóstico")) {
-      form.setError("diagnosticoUrl", {
-        type: "manual",
-        message: "La URL de diagnóstico debe ser válida y comenzar con http:// o https://"
-      })
-    }
-
-    // Validar URL de solicitud
-    if (values.solicitudUrl && !validateUrl(values.solicitudUrl, "URL de Solicitud")) {
+    // Validar URLs si están presentes
+    if (values.solicitudUrl && !validateUrl(values.solicitudUrl, "solicitudUrl")) {
+      errors.push({ field: "solicitudUrl", message: "URL de solicitud inválida" })
       form.setError("solicitudUrl", {
         type: "manual",
-        message: "La URL de solicitud debe ser válida y comenzar con http:// o https://"
+        message: "Debe ser una URL válida que comience con http:// o https://"
       })
     }
 
-    // Validar URL de respuesta
-    if (values.respuestaUrl && !validateUrl(values.respuestaUrl, "URL de Respuesta")) {
+    if (values.respuestaUrl && !validateUrl(values.respuestaUrl, "respuestaUrl")) {
+      errors.push({ field: "respuestaUrl", message: "URL de respuesta inválida" })
       form.setError("respuestaUrl", {
         type: "manual",
-        message: "La URL de respuesta debe ser válida y comenzar con http:// o https://"
+        message: "Debe ser una URL válida que comience con http:// o https://"
       })
     }
 
-    // Validar URLs de acciones
-    const invalidActionUrls: string[] = []
+    if (values.diagnosticoUrl && !validateUrl(values.diagnosticoUrl, "diagnosticoUrl")) {
+      errors.push({ field: "diagnosticoUrl", message: "URL de diagnóstico inválida" })
+      form.setError("diagnosticoUrl", {
+        type: "manual",
+        message: "Debe ser una URL válida que comience con http:// o https://"
+      })
+    }
+
+    // Validar acciones (solo URLs si están presentes)
+    const accionesErrors: string[] = []
     acciones.forEach((accion, index) => {
-      if (accion.urlAccion && !validateUrl(accion.urlAccion, `URL de Acción #${index + 1}`)) {
-        invalidActionUrls.push(`Acción #${index + 1}: ${accion.urlAccion}`)
+      if (accion.urlAccion && accion.urlAccion.trim() !== "" && !isValidUrl(accion.urlAccion)) {
+        accionesErrors.push(`URL de acción ${index + 1} inválida`)
       }
-      if (accion.urlRespuesta && !validateUrl(accion.urlRespuesta, `URL de Respuesta de Acción #${index + 1}`)) {
-        invalidActionUrls.push(`URL de Respuesta de Acción #${index + 1}: ${accion.urlRespuesta}`)
+      if (accion.urlRespuesta && accion.urlRespuesta.trim() !== "" && !isValidUrl(accion.urlRespuesta)) {
+        accionesErrors.push(`URL de respuesta de acción ${index + 1} inválida`)
       }
     })
 
-    if (invalidActionUrls.length > 0) {
-      await showUrlValidationError(invalidActionUrls)
+    // Si hay campos faltantes, mostrar errores y no continuar
+    if (missingFields.length > 0) {
+      showMissingFieldsError(missingFields)
+      
+      // Hacer scroll al primer campo con error
+      const firstErrorElement = document.querySelector('.ring-red-200, [data-invalid="true"]') as HTMLElement
+      if (firstErrorElement) {
+        const firstErrorField = firstErrorElement.closest('.space-y-3, .form-container-fixed') as HTMLElement
+        firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      
       return
     }
 
-    // Si hay campos faltantes, mostrar errores y popup
-    if (missingFields.length > 0) {
-      // Mostrar alerta con los campos faltantes
-      await showMissingFieldsError(missingFields)
+    // Si hay errores de URL, mostrar errores y no continuar
+    if (errors.length > 0 || accionesErrors.length > 0) {
+      const allErrors = [...errors.map(e => e.message), ...accionesErrors]
+      showUrlValidationError(allErrors)
       
       // Hacer scroll al primer campo con error
-      const firstErrorField = document.querySelector('.text-red-500, [data-invalid="true"]') as HTMLElement
-      if (firstErrorField) {
-        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      const firstErrorElement = document.querySelector('.ring-red-200, [data-invalid="true"]') as HTMLElement
+      if (firstErrorElement) {
+        const firstErrorField = firstErrorElement.closest('.space-y-3, .form-container-fixed') as HTMLElement
+        firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
       
       return
@@ -297,7 +389,7 @@ export default function CrearDiagnosticoPage() {
 
     // Verificar si hay errores de URL en los campos del formulario
     const formState = form.formState
-    if (formState.errors.solicitudUrl || formState.errors.respuestaUrl) {
+    if (formState.errors.solicitudUrl || formState.errors.respuestaUrl || formState.errors.diagnosticoUrl) {
       await showError(
         'URLs Inválidas',
         'Por favor, corrija las URLs antes de continuar. Las URLs deben comenzar con http:// o https://'
@@ -322,13 +414,13 @@ export default function CrearDiagnosticoPage() {
       
       const diagnosticoData = {
         nombreActividad: values.nombreActividad,
-        diagnosticoUrl: values.diagnosticoUrl || '',
-        municipio: values.municipio,
-        poder: values.poder,
-        organo: values.organo,
-        actividad: values.actividad,
+        entePublico: values.entePublico!, // Usar assertion porque ya validamos que no es undefined
+        actividad: values.actividad!,
+        poder: values.poder!,
+        organo: values.organo!,
         solicitudUrl: values.solicitudUrl || '',
         respuestaUrl: values.respuestaUrl || '',
+        diagnosticoUrl: values.diagnosticoUrl || '',
         unidadAdministrativa: values.unidadAdministrativa,
         evaluacion: values.evaluacion,
         observaciones: values.observaciones || '',
@@ -347,11 +439,11 @@ export default function CrearDiagnosticoPage() {
       // Mostrar mensaje de éxito
       await showSuccess(
         '¡Diagnóstico creado!',
-        `El diagnóstico para ${values.municipio} ha sido creado exitosamente.`
+        `El diagnóstico del ente ${values.entePublico} ha sido creado exitosamente.`
       )
       
-                      // Redirigir a la Vista Detallada
-      router.push('/dashboard/diagnosticos?view=tablero')
+      // Redirigir a la Vista Detallada
+      router.push('/dashboard/diagnosticos-entes')
       
     } catch (error) {
       console.error('💥 Error al crear diagnósticos:', error)
@@ -366,7 +458,7 @@ export default function CrearDiagnosticoPage() {
   }
 
   return (
-    <ProtectedRoute allowedRoles={['OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']}>
+    <ProtectedRoute allowedRoles={['ADMINISTRADOR', 'OPERATIVO', 'SEGUIMIENTO']}>
       <main className="w-full min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
         <div className="container mx-auto p-4 md:p-8 pt-6">
           <div className="space-y-6">
@@ -380,10 +472,10 @@ export default function CrearDiagnosticoPage() {
               </Link>
               <ChevronRight className="h-4 w-4" />
               <Link 
-                href="/dashboard/diagnosticos" 
+                href="/dashboard/diagnosticos-entes" 
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
-                Diagnósticos Entes Públicos
+                Diagnósticos Entes
               </Link>
               <ChevronRight className="h-4 w-4" />
               <span className="font-medium text-blue-600 dark:text-blue-400">
@@ -394,12 +486,14 @@ export default function CrearDiagnosticoPage() {
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Crear diagnóstico municipal
+              Crear diagnóstico de ente
             </h1>
             <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Crea diagnósticos para los entes públicos de Morelos
+              Registra un nuevo diagnóstico para un ente público del estado de Morelos
             </p>
           </div>
+
+          <div className="shrink-0 bg-border h-[1px] w-full" />
 
           <div className="shrink-0 bg-border h-[1px] w-full" />
 
@@ -416,81 +510,43 @@ export default function CrearDiagnosticoPage() {
                   </CardHeader>
                   <CardContent className="p-8 pt-0 relative z-10 space-y-4">
                     
-                    {/* Nombre de Actividad y URL de Diagnóstico - EN GRID HORIZONTAL */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="nombreActividad"
-                        render={({ field, fieldState }) => (
-                          <FormItem className="space-y-3">
-                            <FormLabel className="text-base font-semibold text-slate-700 dark:text-slate-200">
-                              Nombre de Actividad <span className="text-red-500 font-bold text-lg ml-1">*</span>
-                            </FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="Ej: Evaluación de capacidades digitales 2025"
-                                {...field}
-                                onChange={(e) => {
-                                  field.onChange(e)
-                                  clearFieldError('nombreActividad')
-                                }}
-                                className={cn(
-                                  "h-12 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300",
-                                  fieldState.error && "!border-red-500 !bg-red-50 dark:!bg-red-900/30 ring-2 ring-red-200"
-                                )}
-                              />
-                            </FormControl>
-                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                              Nombre descriptivo de la actividad a realizar
-                            </FormDescription>
-                            <FormMessage className="text-red-600 font-medium" />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="diagnosticoUrl"
-                        render={({ field, fieldState }) => (
-                          <FormItem className="space-y-3">
-                            <FormLabel className="text-base font-semibold text-slate-700 dark:text-slate-200">
-                              URL de Diagnóstico (PDF)
-                            </FormLabel>
-                            <div className="flex gap-2">
-                              <FormControl>
-                                <Input
-                                  type="url"
-                                  placeholder="https://ejemplo.com/diagnostico.pdf"
-                                  {...field}
-                                  onChange={(e) => {
-                                    field.onChange(e)
-                                    clearFieldError('diagnosticoUrl')
-                                  }}
-                                  className={cn(
-                                    "h-12 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300",
-                                    fieldState.error && "!border-red-500 !bg-red-50 dark:!bg-red-900/30 ring-2 ring-red-200"
-                                  )}
-                                />
-                              </FormControl>
-                              <Button type="button" variant="outline" size="icon" className="h-12 w-12">
-                                <Upload className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                              URL del archivo PDF de diagnóstico (debe comenzar con http:// o https://)
-                            </FormDescription>
-                            <FormMessage className="text-red-600 font-medium" />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                    {/* Nombre de Actividad - MOVIDO AL PRIMER LUGAR */}
+                    <FormField
+                      control={form.control}
+                      name="nombreActividad"
+                      render={({ field, fieldState }) => (
+                        <FormItem className="space-y-3">
+                          <FormLabel className="text-base font-semibold text-slate-700 dark:text-slate-200">
+                            Nombre de Actividad <span className="text-red-500 font-bold text-lg ml-1">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Ej: Revisión de transparencia 2024"
+                              {...field}
+                              onChange={(e) => {
+                                field.onChange(e)
+                                clearFieldError('nombreActividad')
+                              }}
+                              className={cn(
+                                "h-12 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-2 border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300",
+                                fieldState.error && "!border-red-500 !bg-red-50 dark:!bg-red-900/30 ring-2 ring-red-200"
+                              )}
+                            />
+                          </FormControl>
+                          <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                            Nombre descriptivo de la actividad a realizar
+                          </FormDescription>
+                          <FormMessage className="text-red-600 font-medium" />
+                        </FormItem>
+                      )}
+                    />
 
                     {/* Ente Público y Tipo de Actividad - AL MISMO NIVEL HORIZONTAL */}
                     <div className="form-grid-fixed">
                       {/* Selección de Ente Público */}
                       <FormField
                         control={form.control}
-                        name="municipio"
+                        name="entePublico"
                         render={({ field, fieldState }) => (
                           <FormItem className="form-container-fixed">
                             <FormLabel className="text-base font-semibold text-slate-700 dark:text-slate-200">
@@ -499,9 +555,9 @@ export default function CrearDiagnosticoPage() {
                             <Select 
                               onValueChange={(value) => {
                                 field.onChange(value)
-                                clearFieldError('municipio')
+                                clearFieldError('entePublico')
                               }} 
-                              value={field.value || ''}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger className={cn(
@@ -520,15 +576,17 @@ export default function CrearDiagnosticoPage() {
                                 avoidCollisions={false}
                                 collisionPadding={0}
                               >
-                                {MUNICIPIOS_MORELOS.map((ente) => (
-                                  <SelectItem key={ente} value={ente}>
-                                    {ente}
-                                  </SelectItem>
-                                ))}
+                                <ScrollArea className="h-60">
+                                  {ENTES_PUBLICOS_MORELOS.map((ente) => (
+                                    <SelectItem key={ente} value={ente}>
+                                      {ente}
+                                    </SelectItem>
+                                  ))}
+                                </ScrollArea>
                               </SelectContent>
                             </Select>
                             <FormDescription>
-                              Selecciona el ente público para crear el diagnóstico
+                              Selecciona el ente público a evaluar
                             </FormDescription>
                             <FormMessage className="text-red-600 font-medium" />
                           </FormItem>
@@ -549,7 +607,7 @@ export default function CrearDiagnosticoPage() {
                                 field.onChange(value)
                                 clearFieldError('actividad')
                               }} 
-                              value={field.value || ''}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger className={cn(
@@ -574,7 +632,7 @@ export default function CrearDiagnosticoPage() {
                               </SelectContent>
                             </Select>
                             <FormDescription>
-                              Categoría del diagnóstico que se aplicará al ente público seleccionado
+                              Tipo de evaluación a realizar
                             </FormDescription>
                             <FormMessage className="text-red-600 font-medium" />
                           </FormItem>
@@ -582,9 +640,9 @@ export default function CrearDiagnosticoPage() {
                       />
                     </div>
 
-                    {/* Poder y Órgano - NUEVOS CAMPOS */}
+                    {/* Poder y Órgano */}
                     <div className="form-grid-fixed">
-                      {/* Campo de Poder */}
+                      {/* Poder */}
                       <FormField
                         control={form.control}
                         name="poder"
@@ -598,20 +656,20 @@ export default function CrearDiagnosticoPage() {
                                 field.onChange(value)
                                 clearFieldError('poder')
                               }} 
-                              value={field.value || ''}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger className={cn(
                                   "select-trigger-fixed border-2",
                                   fieldState.error && "!border-red-500 !bg-red-50 dark:!bg-red-900/30 ring-2 ring-red-200"
                                 )}>
-                                  <SelectValue placeholder="Selecciona el poder" />
+                                  <SelectValue placeholder="Selecciona un poder" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent 
                                 className="select-content-portal max-h-[200px] min-w-[200px]"
                                 position="popper"
-                                side="bottom"
+                                side="bottom" 
                                 align="start"
                                 sideOffset={8}
                                 avoidCollisions={false}
@@ -631,7 +689,7 @@ export default function CrearDiagnosticoPage() {
                         )}
                       />
 
-                      {/* Campo de Órgano */}
+                      {/* Órgano */}
                       <FormField
                         control={form.control}
                         name="organo"
@@ -645,7 +703,7 @@ export default function CrearDiagnosticoPage() {
                                 field.onChange(value)
                                 clearFieldError('organo')
                               }} 
-                              value={field.value || ''}
+                              value={field.value}
                             >
                               <FormControl>
                                 <SelectTrigger className={cn(
@@ -658,7 +716,7 @@ export default function CrearDiagnosticoPage() {
                               <SelectContent 
                                 className="select-content-portal max-h-[200px] min-w-[200px]"
                                 position="popper"
-                                side="bottom"
+                                side="bottom" 
                                 align="start"
                                 sideOffset={8}
                                 avoidCollisions={false}
@@ -671,7 +729,7 @@ export default function CrearDiagnosticoPage() {
                               </SelectContent>
                             </Select>
                             <FormDescription>
-                              Tipo de órgano según su estructura organizacional
+                              Tipo de órgano administrativo
                             </FormDescription>
                             <FormMessage className="text-red-600 font-medium" />
                           </FormItem>
@@ -748,6 +806,40 @@ export default function CrearDiagnosticoPage() {
                           </FormItem>
                         )}
                       />
+
+                      <FormField
+                        control={form.control}
+                        name="diagnosticoUrl"
+                        render={({ field, fieldState }) => (
+                          <FormItem>
+                            <FormLabel>URL de Diagnóstico (PDF)</FormLabel>
+                            <div className="flex gap-2">
+                              <FormControl>
+                                <Input
+                                  type="url"
+                                  placeholder="https://ejemplo.com/diagnostico.pdf"
+                                  {...field}
+                                  onChange={(e) => {
+                                    field.onChange(e)
+                                    clearFieldError('diagnosticoUrl')
+                                  }}
+                                  className={cn(
+                                    "bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-slate-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-300",
+                                    fieldState.error && "border-red-500 bg-red-50/50 dark:bg-red-900/20"
+                                  )}
+                                />
+                              </FormControl>
+                              <Button type="button" variant="outline" size="icon">
+                                <Upload className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                              URL del archivo PDF de diagnóstico (debe comenzar con http:// o https://)
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
 
                   </CardContent>
@@ -794,7 +886,7 @@ export default function CrearDiagnosticoPage() {
                             <div className="space-y-1">
                               <Label className="text-xs">Tipo de Acción</Label>
                               <Select 
-                                value={accion.descripcion} 
+                                value={accion.descripcion || 'Invitación'} 
                                 onValueChange={(value) => actualizarAccion(accion.id, 'descripcion', value)}
                               >
                                 <SelectTrigger className="select-trigger-fixed">
@@ -926,7 +1018,7 @@ export default function CrearDiagnosticoPage() {
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Ej: Dirección de Tecnologías"
+                                placeholder="Ej: Coordinación de Transparencia"
                                 {...field}
                                 onChange={(e) => {
                                   field.onChange(e)
@@ -939,7 +1031,7 @@ export default function CrearDiagnosticoPage() {
                               />
                             </FormControl>
                             <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                              Especifica la unidad administrativa responsable
+                              Área responsable del ente público
                             </FormDescription>
                             <FormMessage className="text-red-600 font-medium" />
                           </FormItem>
@@ -962,7 +1054,7 @@ export default function CrearDiagnosticoPage() {
                               />
                             </FormControl>
                             <FormDescription className="text-slate-600 dark:text-slate-400">
-                              Evalúa el nivel de cumplimiento del diagnóstico municipal (0-100%)
+                              Evalúa el nivel de cumplimiento del diagnóstico del ente (0-100%)
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -979,7 +1071,7 @@ export default function CrearDiagnosticoPage() {
                           <FormControl>
                             <textarea
                               className="w-full p-3 border rounded-md resize-none h-20"
-                              placeholder="Observaciones generales para todos los municipios..."
+                              placeholder="Observaciones adicionales sobre el diagnóstico..."
                               {...field}
                             />
                           </FormControl>
@@ -998,7 +1090,7 @@ export default function CrearDiagnosticoPage() {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={() => router.push('/dashboard/diagnosticos')}
+                  onClick={() => router.push('/dashboard/diagnosticos-entes')}
                   disabled={loading}
                 >
                   Cancelar

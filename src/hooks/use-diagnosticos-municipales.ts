@@ -7,9 +7,12 @@ export interface DiagnosticoMunicipal {
   id: number
   nombreActividad: string
   municipio: string
+  poder?: string
+  organo?: string
   actividad: string
   solicitudUrl?: string
   respuestaUrl?: string
+  diagnosticoUrl?: string
   unidadAdministrativa: string
   evaluacion: number
   observaciones?: string
@@ -17,6 +20,7 @@ export interface DiagnosticoMunicipal {
     id: string
     descripcion: string
     urlAccion: string
+    urlRespuesta?: string
     fechaLimite: string
     completada: boolean
   }>

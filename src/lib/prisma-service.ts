@@ -29,7 +29,7 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-// Municipios de Morelos
+// Entes Públicos de Morelos (Municipios + Otros Entes)
 export const MUNICIPIOS_MORELOS = [
   'Amacuzac',
   'Atlatlahucan',
@@ -66,7 +66,27 @@ export const MUNICIPIOS_MORELOS = [
   'Yautepec',
   'Yecapixtla',
   'Zacatepec',
-  'Zacualpan de Amilpas'
+  'Zacualpan de Amilpas',
+  'Sistema de Agua Potable del Municipio de Xochitepec',
+  'Sistema de Agua Potable y Alcantarillado de Municipio de Cuernavaca',
+  'Sistema de Agua Potable y Saneamiento de Jojutla',
+  'Sistema de Agua Potable y Saneamiento de Yautepec',
+  'Sistema de Conservación de Agua Potable y Saneamiento de Emiliano Zapata',
+  'Sistema de Conservación de Agua Potable y Saneamiento de Jiutepec',
+  'Sistema de Conservación de Agua Potable y Saneamiento de Puente de Ixtla',
+  'Sistema de Conservación de Agua Potable y Saneamiento de Temixco',
+  'Sistema de Conservación de Agua Potable y Saneamiento de Zacatepec',
+  'Sistema Municipal DIF de Atlatlahucan',
+  'Sistema Municipal DIF de Ayala',
+  'Sistema Municipal DIF de Cuernavaca',
+  'Sistema Municipal DIF de Emiliano Zapata',
+  'Sistema Municipal DIF de Jiutepec',
+  'Sistema Municipal DIF de Temixco',
+  'Sistema Municipal DIF de Tetecala',
+  'Sistema Municipal DIF de Xochitepec',
+  'Sistema Municipal DIF de Zacatepec',
+  'Sistema Operador de Agua Potable y Saneamiento del Municipio de Ayala',
+  'Sistema Operador de Agua Potable y Saneamiento del Municipio de Cuautla'
 ]
 
 // Servicio para manejar entes públicos con Prisma

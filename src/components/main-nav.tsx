@@ -34,6 +34,11 @@ const items: NavItem[] = [
     icon: FileText,
   },
   {
+    title: "Diagnósticos Entes",
+    href: "/dashboard/diagnosticos-entes",
+    icon: Building2,
+  },
+  {
     title: "Acuerdos y Seguimientos",
     href: "/dashboard/acuerdos",
     icon: Calendar,
@@ -110,6 +115,12 @@ export function MainNav() {
         title: "Diagnósticos Municipios",
         href: "/dashboard/diagnosticos",
         icon: FileText,
+        roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
+      },
+      {
+        title: "Diagnósticos Entes",
+        href: "/dashboard/diagnosticos-entes",
+        icon: Building2,
         roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
       },
       {

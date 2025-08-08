@@ -1,0 +1,29 @@
+INFORMACIÓN DEL RESPALDO
+========================
+Fecha de creación: 2025-08-07 18:17:47
+Propósito: Respaldo antes de agregar campo diagnosticoUrl
+Base de datos: tablero_estadistico_prod (PostgreSQL)
+Host: localhost:5432
+Usuario: admin
+Archivo original: backup_before_diagnosticourl_20250807_181746_full.sql
+Archivo comprimido: backup_before_diagnosticourl_20250807_181746_full.sql.gz
+Tamaño original: 136K
+Tamaño comprimido: 27K
+
+TABLAS PRINCIPALES RESPALDADAS:
+- diagnosticos_municipales
+- diagnosticos_entes
+- usuarios
+- acuerdos_seguimiento
+- seguimientos
+- audit_logs
+
+INSTRUCCIONES DE RESTAURACIÓN:
+1. Descomprimir: gunzip /home/ubuntu/seguimiento/backups/backup_before_diagnosticourl_20250807_181746_full.sql.gz
+2. Restaurar: psql -h localhost -p 5432 -U admin -d postgres < /home/ubuntu/seguimiento/backups/backup_before_diagnosticourl_20250807_181746_full.sql
+
+NOTAS:
+- Este respaldo incluye estructura y datos completos
+- Se realizó antes de agregar el campo 'diagnosticoUrl' a las tablas
+- Compatible con PostgreSQL
+- Incluye comandos CREATE DATABASE y DROP DATABASE

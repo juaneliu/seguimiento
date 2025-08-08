@@ -1,7 +1,8 @@
 {
   "apps": [{
     "name": "seguimiento-saem",
-    "script": "server.js",
+    "script": "npm",
+    "args": "start",
     "instances": 1,
     "exec_mode": "cluster",
     "env": {
