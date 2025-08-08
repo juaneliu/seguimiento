@@ -37,7 +37,8 @@ import {
   Notebook,
   FileText,
   Calendar,
-  Activity
+  Activity,
+  Building2
 } from "lucide-react"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
@@ -64,21 +65,27 @@ const navItems: NavItem[] = [
     roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
-    title: "Diagnósticos",
+    title: "Directorio",
+    href: "/dashboard/directorio", 
+    icon: Notebook,
+    roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
+  },
+  {
+    title: "Diagnósticos Municipios",
     href: "/dashboard/diagnosticos",
     icon: FileText,
     roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
-    title: "Acuerdos",
-    href: "/dashboard/acuerdos",
-    icon: Calendar,
+    title: "Diagnósticos Entes",
+    href: "/dashboard/diagnosticos-entes",
+    icon: Building2,
     roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {
-    title: "Directorio",
-    href: "/dashboard/directorio", 
-    icon: Notebook,
+    title: "Acuerdos y Seguimientos",
+    href: "/dashboard/acuerdos",
+    icon: Calendar,
     roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
   },
   {

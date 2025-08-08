@@ -33,7 +33,9 @@ import {
   RefreshCw,
   Eye,
   Loader2,
-  Activity
+  Activity,
+  AlertCircle,
+  Timer
 } from "lucide-react"
 import { showError, showSuccess, showConfirm } from "@/lib/notifications"
 import { useDiagnosticosMunicipales } from "@/hooks/use-diagnosticos-municipales"
@@ -467,219 +469,361 @@ function DiagnosticosMunicipiosContent() {
                   {/* Gráficos de estadísticas - usando estilos de Acuerdos con gradientes y efectos */}
               {canEdit && (
                 <div className="grid gap-4 lg:grid-cols-3 md:grid-cols-2">
-                  {/* Gráfico circular de progreso con selector temporal */}
-                  <Card className="bg-gradient-to-br from-white via-slate-50 to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 via-indigo-200/20 to-purple-200/20 dark:from-blue-800/10 dark:via-indigo-800/10 dark:to-purple-800/10 rounded-full blur-3xl -z-10"></div>
+                  {/* Card de Diagnósticos Críticos y Alertas de Cumplimiento */}
+                  <Card className="bg-gradient-to-br from-white via-slate-50 to-red-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-200/20 via-orange-200/20 to-yellow-200/20 dark:from-red-800/10 dark:via-orange-800/10 dark:to-yellow-800/10 rounded-full blur-3xl -z-10"></div>
                   <CardHeader className="relative z-10 pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
-                        <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-                          <TrendingUp className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent font-bold">
-                          Progreso Global
-                        </span>
-                      </CardTitle>
-                      
-                      {/* Selector de período temporal */}
-                      <div className="flex items-center gap-1.5">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
-                            filtros.trimestre === 'todos' 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
-                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
-                          }`}
-                          onClick={() => aplicarFiltroTrimestre('todos')}
-                        >
-                          Total
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
-                            filtros.trimestre === 'Q1' 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
-                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
-                          }`}
-                          onClick={() => aplicarFiltroTrimestre('Q1')}
-                        >
-                          Q1
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
-                            filtros.trimestre === 'Q2' 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
-                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
-                          }`}
-                          onClick={() => aplicarFiltroTrimestre('Q2')}
-                        >
-                          Q2
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
-                            filtros.trimestre === 'Q3' 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
-                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
-                          }`}
-                          onClick={() => aplicarFiltroTrimestre('Q3')}
-                        >
-                          Q3
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`text-xs px-3 py-1.5 h-8 rounded-lg font-medium transition-all duration-300 ${
-                            filtros.trimestre === 'Q4' 
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 border-0' 
-                              : 'bg-white/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-600/60 hover:bg-white/80 dark:hover:bg-slate-700/80 hover:border-blue-300 dark:hover:border-blue-500 backdrop-blur-sm'
-                          }`}
-                          onClick={() => aplicarFiltroTrimestre('Q4')}
-                        >
-                          Q4
-                        </Button>
+                    <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
+                      <div className="p-1.5 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg shadow-lg">
+                        <AlertTriangle className="h-4 w-4 text-white" />
                       </div>
-                    </div>
+                      <span className="bg-gradient-to-r from-red-700 via-orange-700 to-yellow-700 dark:from-red-400 dark:via-orange-400 dark:to-yellow-400 bg-clip-text text-transparent font-bold">
+                        Diagnósticos Críticos y Alertas
+                      </span>
+                    </CardTitle>
                     
-                    {/* Indicador del período activo */}
+                    {/* Descripción */}
                     <div className="mt-2">
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {filtros.trimestre === 'todos' ? 'Mostrando datos de todo el año 2025' :
-                         filtros.trimestre === 'Q1' ? 'Primer trimestre 2025 (Ene-Mar)' :
-                         filtros.trimestre === 'Q2' ? 'Segundo trimestre 2025 (Abr-Jun)' :
-                         filtros.trimestre === 'Q3' ? 'Tercer trimestre 2025 (Jul-Sep)' :
-                         'Cuarto trimestre 2025 (Oct-Dic)'}
+                        Diagnósticos pendientes que requieren atención urgente y próximos a vencimiento
                       </p>
                     </div>
                   </CardHeader>
                   <CardContent className="relative z-10 pt-2">
-                    <div className="flex items-center gap-6">
-                      {/* Gráfica extra grande */}
-                      <div className="flex-1 flex items-center justify-center">
-                        <div className="relative w-40 h-40">
-                          <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                            <circle
-                              cx="80"
-                              cy="80"
-                              r="70"
-                              stroke="currentColor"
-                              strokeWidth="10"
-                              fill="transparent"
-                              className="text-gray-200"
-                            />
-                            <circle
-                              cx="80"
-                              cy="80"
-                              r="70"
-                              stroke="url(#gradient1)"
-                              strokeWidth="10"
-                              fill="transparent"
-                              strokeDasharray={`${((estadisticasFiltradas.completados + estadisticasFiltradas.enProceso * 0.5) / estadisticas.totalMunicipios) * 439.82} 439.82`}
-                            />
-                            <defs>
-                              <linearGradient id="gradient1">
-                                <stop offset="0%" stopColor="#3B82F6" />
-                                <stop offset="100%" stopColor="#8B5CF6" />
-                              </linearGradient>
-                            </defs>
-                          </svg>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                {Math.round(((estadisticasFiltradas.completados + estadisticasFiltradas.enProceso * 0.5) / estadisticas.totalMunicipios) * 100)}%
+                    <div className="space-y-4">
+                      {(() => {
+                        // Calcular diagnósticos críticos (pendientes sin avance)
+                        const diagnosticosCriticos = diagnosticos.filter(d => d.evaluacion === 0)
+                        
+                        // Calcular alertas de cumplimiento (evaluación baja)
+                        const alertasCumplimiento = diagnosticos.filter(d => d.evaluacion > 0 && d.evaluacion < 30)
+                        
+                        // Diagnósticos en riesgo (evaluación entre 30-50%)
+                        const diagnosticosEnRiesgo = diagnosticos.filter(d => d.evaluacion >= 30 && d.evaluacion < 50)
+                        
+                        // Calcular estadísticas por municipio para identificar los más críticos
+                        const estadisticasPorMunicipio = diagnosticos.reduce((acc: any, d) => {
+                          const municipio = d.municipio || 'Sin especificar'
+                          if (!acc[municipio]) {
+                            acc[municipio] = { 
+                              total: 0, 
+                              criticos: 0, 
+                              alertas: 0, 
+                              enRiesgo: 0,
+                              promedioEvaluacion: 0,
+                              sumaEvaluaciones: 0
+                            }
+                          }
+                          acc[municipio].total++
+                          acc[municipio].sumaEvaluaciones += d.evaluacion
+                          
+                          if (d.evaluacion === 0) acc[municipio].criticos++
+                          else if (d.evaluacion < 30) acc[municipio].alertas++
+                          else if (d.evaluacion < 50) acc[municipio].enRiesgo++
+                          
+                          return acc
+                        }, {})
+                        
+                        // Calcular promedios por municipio
+                        Object.keys(estadisticasPorMunicipio).forEach(municipio => {
+                          const stats = estadisticasPorMunicipio[municipio]
+                          stats.promedioEvaluacion = stats.sumaEvaluaciones / stats.total
+                        })
+                        
+                        // Obtener los municipios más críticos
+                        const municipiosCriticos = Object.entries(estadisticasPorMunicipio)
+                          .sort(([,a]: any, [,b]: any) => {
+                            const criticidadA = (a.criticos * 3) + (a.alertas * 2) + (a.enRiesgo * 1)
+                            const criticidadB = (b.criticos * 3) + (b.alertas * 2) + (b.enRiesgo * 1)
+                            return criticidadB - criticidadA
+                          })
+                          .slice(0, 3)
+                        
+                        return (
+                          <>
+                            {/* Métricas principales de criticidad */}
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                                  <span className="text-xs text-red-600 dark:text-red-400 font-medium">Críticos</span>
+                                </div>
+                                <div className="text-2xl font-bold text-red-700 dark:text-red-300">
+                                  {diagnosticosCriticos.length}
+                                </div>
+                                <div className="text-xs text-red-600 dark:text-red-400 mt-1">
+                                  Sin avance (0%)
+                                </div>
                               </div>
-                              <div className="text-base text-gray-500 font-medium">
-                                {filtros.trimestre === 'todos' ? 'Avance Total' : `Avance ${filtros.trimestre}`}
+                              
+                              <div className="p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                  <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">Alertas</span>
+                                </div>
+                                <div className="text-2xl font-bold text-orange-700 dark:text-orange-300">
+                                  {alertasCumplimiento.length}
+                                </div>
+                                <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                  Avance muy bajo (&lt;30%)
+                                </div>
+                              </div>
+                              
+                              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Timer className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                                  <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">En Riesgo</span>
+                                </div>
+                                <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
+                                  {diagnosticosEnRiesgo.length}
+                                </div>
+                                <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
+                                  Avance insuficiente (30-50%)
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Valores en columna lateral */}
-                      <div className="flex flex-col space-y-3 min-w-[120px]">
-                        <div className="flex flex-col items-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Completados</span>
-                          <span className="text-xl font-bold text-emerald-700 dark:text-emerald-300">{estadisticasFiltradas.completados}</span>
-                        </div>
-                        <div className="flex flex-col items-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                          <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">En Proceso</span>
-                          <span className="text-xl font-bold text-amber-700 dark:text-amber-300">{estadisticasFiltradas.enProceso}</span>
-                        </div>
-                        <div className="flex flex-col items-center p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-200 dark:border-rose-800">
-                          <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">Pendientes</span>
-                          <span className="text-xl font-bold text-rose-700 dark:text-rose-300">{estadisticasFiltradas.pendientes}</span>
-                        </div>
-                        
-                        {/* Información adicional del período */}
-                        <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-                          <div className="text-xs text-slate-600 dark:text-slate-400 text-center">
-                            <div className="font-medium">Total período</div>
-                            <div className="text-sm font-bold text-slate-800 dark:text-slate-200">{estadisticasFiltradas.total}</div>
-                          </div>
-                        </div>
-                      </div>
+                            
+                            {/* Gráfico de distribución de criticidad */}
+                            <div className="p-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg border border-slate-200/80 dark:border-slate-600/80">
+                              <h4 className="text-md font-semibold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+                                <BarChart3 className="h-4 w-4 text-red-600" />
+                                Nivel de Criticidad General
+                              </h4>
+                              <div className="flex items-center justify-center mb-4">
+                                <div className="relative w-32 h-32">
+                                  <svg viewBox="0 0 42 42" className="w-32 h-32 transform -rotate-90">
+                                    <circle cx="21" cy="21" r="15.915494309189533" fill="transparent" stroke="#e5e7eb" strokeWidth="3"></circle>
+                                    {(() => {
+                                      const total = diagnosticos.length;
+                                      if (total === 0) return null;
+                                      
+                                      const criticosPercent = (diagnosticosCriticos.length / total) * 100;
+                                      const alertasPercent = (alertasCumplimiento.length / total) * 100;
+                                      const riesgoPercent = (diagnosticosEnRiesgo.length / total) * 100;
+                                      
+                                      const offset = 0;
+                                      const radius = 15.915494309189533;
+                                      
+                                      return (
+                                        <>
+                                          {diagnosticosCriticos.length > 0 && (
+                                            <circle
+                                              cx="21" cy="21" r={radius} fill="transparent"
+                                              stroke="#dc2626" strokeWidth="3"
+                                              strokeDasharray={`${criticosPercent} ${100 - criticosPercent}`}
+                                              strokeDashoffset={offset}
+                                              className="transition-all duration-500"
+                                            />
+                                          )}
+                                          {alertasCumplimiento.length > 0 && (
+                                            <circle
+                                              cx="21" cy="21" r={radius} fill="transparent"
+                                              stroke="#ea580c" strokeWidth="3"
+                                              strokeDasharray={`${alertasPercent} ${100 - alertasPercent}`}
+                                              strokeDashoffset={offset - criticosPercent}
+                                              className="transition-all duration-500"
+                                            />
+                                          )}
+                                          {diagnosticosEnRiesgo.length > 0 && (
+                                            <circle
+                                              cx="21" cy="21" r={radius} fill="transparent"
+                                              stroke="#ca8a04" strokeWidth="3"
+                                              strokeDasharray={`${riesgoPercent} ${100 - riesgoPercent}`}
+                                              strokeDashoffset={offset - criticosPercent - alertasPercent}
+                                              className="transition-all duration-500"
+                                            />
+                                          )}
+                                        </>
+                                      );
+                                    })()}
+                                  </svg>
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="text-center">
+                                      <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                                        {diagnosticosCriticos.length + alertasCumplimiento.length + diagnosticosEnRiesgo.length}
+                                      </div>
+                                      <div className="text-xs text-slate-600 dark:text-slate-400">Requieren atención</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Leyenda del gráfico */}
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                  <span className="text-sm text-slate-600 dark:text-slate-400">Críticos</span>
+                                  <span className="text-sm font-semibold text-red-600 ml-auto">{diagnosticosCriticos.length}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                  <span className="text-sm text-slate-600 dark:text-slate-400">Alertas</span>
+                                  <span className="text-sm font-semibold text-orange-600 ml-auto">{alertasCumplimiento.length}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                  <span className="text-sm text-slate-600 dark:text-slate-400">En Riesgo</span>
+                                  <span className="text-sm font-semibold text-yellow-600 ml-auto">{diagnosticosEnRiesgo.length}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Card de Comparativa Temporal */}
-                <Card className="bg-gradient-to-br from-white via-slate-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
-                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-indigo-200/20 via-blue-200/20 to-cyan-200/20 dark:from-indigo-800/10 dark:via-blue-800/10 dark:to-cyan-800/10 rounded-full blur-3xl -z-10"></div>
+                {/* Card de Municipios que Requieren Atención Urgente */}
+                <Card className="bg-gradient-to-br from-white via-slate-50 to-red-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-700 border-slate-200/60 dark:border-slate-600/60 shadow-xl backdrop-blur-sm overflow-hidden">
+                  <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-red-200/20 via-orange-200/20 to-yellow-200/20 dark:from-red-800/10 dark:via-orange-800/10 dark:to-yellow-800/10 rounded-full blur-3xl -z-10"></div>
                   <CardHeader className="relative z-10 pb-2">
                     <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-100 text-base">
-                      <div className="p-1.5 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg shadow-lg">
-                        <Activity className="h-4 w-4 text-white" />
+                      <div className="p-1.5 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg shadow-lg">
+                        <MapPin className="h-4 w-4 text-white" />
                       </div>
-                      <span className="bg-gradient-to-r from-indigo-700 via-blue-700 to-cyan-700 dark:from-indigo-400 dark:via-blue-400 dark:to-cyan-400 bg-clip-text text-transparent font-bold">
-                        Tendencia Temporal
+                      <span className="bg-gradient-to-r from-red-700 via-orange-700 to-yellow-700 dark:from-red-400 dark:via-orange-400 dark:to-yellow-400 bg-clip-text text-transparent font-bold">
+                        Municipios Urgentes
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="relative z-10 pt-2">
                     <div className="space-y-3">
-                      {/* Métricas de tendencia */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                          <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">Promedio Período</div>
-                          <div className="text-lg font-bold text-blue-700 dark:text-blue-300">
-                            {estadisticasFiltradas.total > 0 ? estadisticasFiltradas.promedioGeneral.toFixed(1) : '0'}%
-                          </div>
-                        </div>
-                        <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                          <div className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">Efectividad</div>
-                          <div className="text-lg font-bold text-indigo-700 dark:text-indigo-300">
-                            {estadisticasFiltradas.total > 0 ? Math.round((estadisticasFiltradas.completados / estadisticasFiltradas.total) * 100) : 0}%
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Indicador de progreso temporal */}
-                      <div className="mt-3">
-                        <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
-                          <span>Progreso del período</span>
-                          <span>{estadisticasFiltradas.total} diagnósticos</span>
-                        </div>
-                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-indigo-500 to-blue-600 h-2 rounded-full transition-all duration-500"
-                            style={{ 
-                              width: `${estadisticas.totalMunicipios > 0 ? Math.min(100, (estadisticasFiltradas.total / estadisticas.totalMunicipios) * 100) : 0}%` 
-                            }}
-                          />
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-center">
-                          {filtros.trimestre === 'todos' ? 
-                            'Cobertura general de municipios' : 
-                            `Actividad en ${filtros.trimestre} vs total de municipios`
+                      {(() => {
+                        // Calcular estadísticas críticas por municipio
+                        const estadisticasPorMunicipio = diagnosticos.reduce((acc: any, d) => {
+                          const municipio = d.municipio || 'Sin especificar'
+                          if (!acc[municipio]) {
+                            acc[municipio] = { 
+                              total: 0, 
+                              criticos: 0, 
+                              alertas: 0, 
+                              enRiesgo: 0,
+                              promedioEvaluacion: 0,
+                              sumaEvaluaciones: 0
+                            }
                           }
-                        </div>
-                      </div>
+                          acc[municipio].total++
+                          acc[municipio].sumaEvaluaciones += d.evaluacion
+                          
+                          if (d.evaluacion === 0) acc[municipio].criticos++
+                          else if (d.evaluacion < 30) acc[municipio].alertas++
+                          else if (d.evaluacion < 50) acc[municipio].enRiesgo++
+                          
+                          return acc
+                        }, {})
+                        
+                        // Calcular promedios y ordenar por criticidad
+                        const municipiosUrgentes = Object.entries(estadisticasPorMunicipio)
+                          .map(([municipio, stats]: any) => {
+                            stats.promedioEvaluacion = stats.sumaEvaluaciones / stats.total
+                            const criticidadScore = (stats.criticos * 3) + (stats.alertas * 2) + (stats.enRiesgo * 1)
+                            return { municipio, ...stats, criticidadScore }
+                          })
+                          .filter(m => m.criticidadScore > 0)
+                          .sort((a, b) => b.criticidadScore - a.criticidadScore)
+                          .slice(0, 5)
+                        
+                        return (
+                          <>
+                            {/* Top municipios críticos */}
+                            {municipiosUrgentes.length > 0 ? (
+                              <div className="space-y-2">
+                                {municipiosUrgentes.map((municipio, index) => (
+                                  <div key={municipio.municipio} className="p-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-lg border border-slate-200/60">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                                          index === 0 ? 'bg-red-500' : 
+                                          index === 1 ? 'bg-orange-500' : 
+                                          index === 2 ? 'bg-yellow-500' : 'bg-slate-500'
+                                        }`}>
+                                          {index + 1}
+                                        </div>
+                                        <div>
+                                          <div className="font-medium text-sm text-slate-800 dark:text-slate-200">
+                                            {municipio.municipio.length > 20 ? `${municipio.municipio.slice(0, 20)}...` : municipio.municipio}
+                                          </div>
+                                          <div className="text-xs text-slate-600 dark:text-slate-400">
+                                            Promedio: {municipio.promedioEvaluacion.toFixed(1)}%
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        {municipio.criticos > 0 && (
+                                          <Badge variant="secondary" className="bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-300 text-xs">
+                                            C:{municipio.criticos}
+                                          </Badge>
+                                        )}
+                                        {municipio.alertas > 0 && (
+                                          <Badge variant="secondary" className="bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300 text-xs">
+                                            A:{municipio.alertas}
+                                          </Badge>
+                                        )}
+                                        {municipio.enRiesgo > 0 && (
+                                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300 text-xs">
+                                            R:{municipio.enRiesgo}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Barra de progreso del municipio */}
+                                    <div className="mt-2">
+                                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                                        <div 
+                                          className={`h-1.5 rounded-full transition-all duration-500 ${
+                                            municipio.promedioEvaluacion >= 75 ? 'bg-green-500' :
+                                            municipio.promedioEvaluacion >= 50 ? 'bg-yellow-500' :
+                                            municipio.promedioEvaluacion >= 30 ? 'bg-orange-500' : 'bg-red-500'
+                                          }`}
+                                          style={{ width: `${municipio.promedioEvaluacion}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-6">
+                                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                                <h4 className="text-md font-medium text-green-700 dark:text-green-300 mb-1">
+                                  ¡Excelente trabajo!
+                                </h4>
+                                <p className="text-sm text-green-600 dark:text-green-400">
+                                  No hay municipios que requieran atención urgente
+                                </p>
+                              </div>
+                            )}
+                            
+                            {/* Resumen de criticidad */}
+                            {municipiosUrgentes.length > 0 && (
+                              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-600">
+                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                  <div className="text-center">
+                                    <div className="text-red-600 dark:text-red-400 font-bold">
+                                      {municipiosUrgentes.reduce((sum, m) => sum + m.criticos, 0)}
+                                    </div>
+                                    <div className="text-slate-500 dark:text-slate-400">Críticos</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="text-orange-600 dark:text-orange-400 font-bold">
+                                      {municipiosUrgentes.reduce((sum, m) => sum + m.alertas, 0)}
+                                    </div>
+                                    <div className="text-slate-500 dark:text-slate-400">Alertas</div>
+                                  </div>
+                                  <div className="text-center">
+                                    <div className="text-yellow-600 dark:text-yellow-400 font-bold">
+                                      {municipiosUrgentes.reduce((sum, m) => sum + m.enRiesgo, 0)}
+                                    </div>
+                                    <div className="text-slate-500 dark:text-slate-400">En Riesgo</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
                     </div>
                   </CardContent>
                 </Card>
@@ -698,45 +842,124 @@ function DiagnosticosMunicipiosContent() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="relative z-10 pt-2">
-                    <div className="space-y-2">
-                      {diagnosticos && diagnosticos.length > 0 ? (() => {
-                        const tiposCount = diagnosticos.reduce((acc: any, diag: any) => {
-                          const actividad = diag.actividad || 'Sin especificar'
-                          acc[actividad] = (acc[actividad] || 0) + 1
-                          return acc
-                        }, {})
-                        
-                        const tiposArray = Object.entries(tiposCount).sort((a: any, b: any) => b[1] - a[1]).slice(0, 4) as [string, number][]
-                        
-                        return tiposArray.map(([tipo, count], index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-lg border border-slate-200/60">
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-violet-600"></div>
-                              <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
-                                {tipo.length > 25 ? `${tipo.slice(0, 25)}...` : tipo}
-                              </span>
+                    <div className="space-y-3">
+                      {/* Tipos de diagnósticos más frecuentes */}
+                      <div className="space-y-2">
+                        <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">Más frecuentes:</div>
+                        {diagnosticos && diagnosticos.length > 0 ? (() => {
+                          const tiposCount = diagnosticos.reduce((acc: any, diag: any) => {
+                            const actividad = diag.actividad || 'Sin especificar'
+                            acc[actividad] = (acc[actividad] || 0) + 1
+                            return acc
+                          }, {})
+                          
+                          const tiposArray = Object.entries(tiposCount).sort((a: any, b: any) => b[1] - a[1]).slice(0, 4) as [string, number][]
+                          
+                          return tiposArray.map(([tipo, count], index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-lg border border-slate-200/60">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-violet-600"></div>
+                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                                  {tipo.length > 20 ? `${tipo.slice(0, 20)}...` : tipo}
+                                </span>
+                              </div>
+                              <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs">
+                                {count}
+                              </Badge>
                             </div>
-                            <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs">
-                              {count}
-                            </Badge>
+                          ))
+                        })() : (
+                          <div className="text-center py-4">
+                            <PieChart className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+                            <p className="text-sm text-slate-500 dark:text-slate-400">No hay tipos registrados</p>
                           </div>
-                        ))
-                      })() : (
-                        <div className="text-center py-4">
-                          <PieChart className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-                          <p className="text-sm text-slate-500 dark:text-slate-400">No hay tipos registrados</p>
+                        )}
+                      </div>
+                      
+                      {/* Diagnósticos por municipio */}
+                      {diagnosticos && diagnosticos.length > 0 && (
+                        <div className="pt-3 border-t border-slate-200/60 dark:border-slate-600/60">
+                          <div className="text-xs text-slate-600 dark:text-slate-400 font-medium mb-2">Municipios más activos:</div>
+                          {(() => {
+                            const municipiosCount = diagnosticos.reduce((acc: any, diag: any) => {
+                              const municipio = diag.municipio || 'Sin especificar'
+                              if (!acc[municipio]) {
+                                acc[municipio] = { count: 0, promedio: 0, sumaEvaluaciones: 0 }
+                              }
+                              acc[municipio].count++
+                              acc[municipio].sumaEvaluaciones += diag.evaluacion
+                              acc[municipio].promedio = acc[municipio].sumaEvaluaciones / acc[municipio].count
+                              return acc
+                            }, {})
+                            
+                            // Crear un algoritmo de scoring que considere tanto cantidad como cumplimiento
+                            const municipiosArray = Object.entries(municipiosCount)
+                              .map(([municipio, data]: [string, any]) => {
+                                // Score combinado: cantidad de diagnósticos * factor de cumplimiento
+                                const factorCumplimiento = data.promedio / 100 // Convertir porcentaje a factor (0-1)
+                                const scoreActividad = data.count * (1 + factorCumplimiento) // Peso mayor a mayor cumplimiento
+                                return [municipio, { ...data, scoreActividad }]
+                              })
+                              .sort((a: any, b: any) => b[1].scoreActividad - a[1].scoreActividad)
+                              .slice(0, 5) as [string, any][]
+                            
+                            return municipiosArray.map(([municipio, data], index) => (
+                              <div key={index} className="flex items-center justify-between p-2 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/10 dark:to-violet-900/10 rounded-lg border border-purple-200/60">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                                    index === 0 ? 'bg-purple-500' : 
+                                    index === 1 ? 'bg-violet-500' : 
+                                    index === 2 ? 'bg-fuchsia-500' :
+                                    index === 3 ? 'bg-indigo-500' :
+                                    'bg-pink-500'
+                                  }`}>
+                                    {index + 1}
+                                  </div>
+                                  <span className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                                    {municipio.length > 15 ? `${municipio.slice(0, 15)}...` : municipio}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {data.count}
+                                  </Badge>
+                                  <Badge 
+                                    variant="secondary" 
+                                    className={`text-xs ${
+                                      data.promedio >= 75 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300' :
+                                      data.promedio >= 50 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300' :
+                                      'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+                                    }`}
+                                  >
+                                    {Math.round(data.promedio)}%
+                                  </Badge>
+                                </div>
+                              </div>
+                            ))
+                          })()}
+                        </div>
+                      )}
+                      
+                      {/* Resumen estadístico */}
+                      {diagnosticos && diagnosticos.length > 0 && (
+                        <div className="pt-3 border-t border-slate-200/60 dark:border-slate-600/60">
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200 dark:border-purple-700">
+                              <div className="font-bold text-purple-700 dark:text-purple-300">
+                                {diagnosticos.length}
+                              </div>
+                              <div className="text-slate-600 dark:text-slate-400">Total diagnósticos</div>
+                            </div>
+                            <div className="text-center p-2 bg-violet-50 dark:bg-violet-900/20 rounded border border-violet-200 dark:border-violet-700">
+                              <div className="font-bold text-violet-700 dark:text-violet-300">
+                                {new Set(diagnosticos.map(d => d.municipio)).size}
+                              </div>
+                              <div className="text-slate-600 dark:text-slate-400">Municipios activos</div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
-                    {diagnosticos && diagnosticos.length > 0 && (
-                      <div className="mt-3 pt-2 border-t border-slate-200/60 dark:border-slate-600/60">
-                        <div className="text-center">
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
-                            {diagnosticos.length} diagnósticos registrados
-                          </span>
-                        </div>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
                 </div>

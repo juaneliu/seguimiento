@@ -41,6 +41,29 @@ model diagnosticos_municipales {
   fechaCreacion        DateTime @default(now())
   fechaActualizacion   DateTime
   creadoPor            String?
+  diagnosticoUrl       String?
+  organo               String   @default("Central")
+  poder                String   @default("Ejecutivo")
+}
+
+model diagnosticos_entes {
+  id                   Int      @id @default(autoincrement())
+  nombreActividad      String
+  entePublico          String
+  actividad            String
+  solicitudUrl         String?
+  respuestaUrl         String?
+  unidadAdministrativa String
+  evaluacion           Float
+  observaciones        String?
+  acciones             Json?
+  estado               String   @default("En Proceso")
+  fechaCreacion        DateTime @default(now())
+  fechaActualizacion   DateTime
+  creadoPor            String?
+  organo               String   @default("Central")
+  poder                String   @default("Ejecutivo")
+  diagnosticoUrl       String?
 }
 
 model directorio_oic {

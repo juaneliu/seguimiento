@@ -50,6 +50,7 @@ interface Accion {
   id: string
   descripcion: string // Ahora será "Invitación", "Exhorto", "Recomendación", "ESAF"
   urlAccion: string   // Antes era "responsable", ahora es URL de Acción (PDF)
+  urlRespuesta?: string // URL de respuesta de Acción (PDF) - aparece cuando está completada
   responsable?: string // Para compatibilidad con datos antiguos
   fechaLimite: string
   completada: boolean
@@ -114,6 +115,7 @@ export default function EditarDiagnosticoPage() {
           id: accion.id || `accion-${index}`,
           descripcion: accion.descripcion || '',
           urlAccion: accion.urlAccion || accion.responsable || '', // Compatibilidad con datos antiguos
+          urlRespuesta: accion.urlRespuesta || '',
           fechaLimite: accion.fechaLimite || '',
           completada: accion.completada || false
         }))
@@ -139,6 +141,7 @@ export default function EditarDiagnosticoPage() {
       id: `action_${accionCounter}`,
       descripcion: '',
       urlAccion: '',
+      urlRespuesta: '',
       fechaLimite: '',
       completada: false
     }
@@ -176,6 +179,18 @@ Esta acción no se puede deshacer.`,
     setAcciones(prev => prev.map(accion =>
       accion.id === id ? { ...accion, [campo]: valor } : accion
     ))
+  }
+
+  // Función para validar URL en tiempo real
+  const isValidUrl = (url: string): boolean => {
+    if (!url || url.trim() === "") return true; // URLs vacías son válidas (opcionales)
+    const trimmedUrl = url.trim();
+    try {
+      new URL(trimmedUrl);
+      return trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://');
+    } catch {
+      return false;
+    }
   }
 
   // Función para eliminar el diagnóstico completo
@@ -250,18 +265,6 @@ Esta acción NO se puede deshacer.`,
     }
   }
 
-  // Función para validar URL en tiempo real
-  const isValidUrl = (url: string): boolean => {
-    if (!url || url.trim() === "") return true; // URLs vacías son válidas (opcionales)
-    const trimmedUrl = url.trim();
-    try {
-      new URL(trimmedUrl);
-      return trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://');
-    } catch {
-      return false;
-    }
-  }
-
   // Función auxiliar para actualización robusta
   const updateDiagnosticoWithTimeout = async (diagnosticoData: any): Promise<any> => {
     const controller = new AbortController()
@@ -316,6 +319,9 @@ Esta acción NO se puede deshacer.`,
       if (urlToValidate && !validateUrl(urlToValidate, `URL de Acción #${index + 1}`)) {
         invalidActionUrls.push(`Acción #${index + 1}: ${urlToValidate}`)
       }
+      if (accion.urlRespuesta && !validateUrl(accion.urlRespuesta, `URL de Respuesta de Acción #${index + 1}`)) {
+        invalidActionUrls.push(`URL de Respuesta de Acción #${index + 1}: ${accion.urlRespuesta}`)
+      }
     })
 
     if (invalidActionUrls.length > 0) {
@@ -347,6 +353,7 @@ Esta acción NO se puede deshacer.`,
         id: accion.id,
         descripcion: accion.descripcion,
         urlAccion: accion.urlAccion || accion.responsable || '', // Migrar responsable a urlAccion
+        urlRespuesta: accion.urlRespuesta || '',
         fechaLimite: accion.fechaLimite,
         completada: accion.completada
       }))
@@ -391,6 +398,7 @@ Esta acción NO se puede deshacer.`,
         id: accion.id || `accion-${index}`,
         descripcion: accion.descripcion || '',
         urlAccion: accion.urlAccion || accion.responsable || '',
+        urlRespuesta: accion.urlRespuesta || '',
         fechaLimite: accion.fechaLimite || '',
         completada: accion.completada || false
       }))
@@ -840,6 +848,40 @@ Esta acción NO se puede deshacer.`,
                                 </div>
                               </div>
                             </div>
+                            
+                            {/* Campo URL de Respuesta - Solo aparece cuando la acción está completada */}
+                            {accion.completada && (
+                              <div className="mt-4 pt-4 border-t border-dashed border-green-300">
+                                <div className="space-y-1">
+                                  <Label className="text-xs text-green-700 font-medium">URL de Respuesta de Acción (PDF)</Label>
+                                  <div className="flex gap-2">
+                                    <div className="flex-1">
+                                      <Input
+                                        type="url"
+                                        placeholder="https://ejemplo.com/respuesta-accion.pdf"
+                                        value={accion.urlRespuesta || ''}
+                                        onChange={(e) => actualizarAccion(accion.id, 'urlRespuesta', e.target.value)}
+                                        className={cn(
+                                          "bg-green-50/50 dark:bg-green-900/20 border-green-200 dark:border-green-700 hover:border-green-300 dark:hover:border-green-600 focus:border-green-500 dark:focus:border-green-400 transition-all duration-300",
+                                          accion.urlRespuesta && !isValidUrl(accion.urlRespuesta) && "border-red-500 bg-red-50/50 dark:bg-red-900/20"
+                                        )}
+                                      />
+                                      {accion.urlRespuesta && !isValidUrl(accion.urlRespuesta) && (
+                                        <p className="text-xs text-red-500 mt-1">
+                                          Debe ser una URL válida que comience con http:// o https://
+                                        </p>
+                                      )}
+                                    </div>
+                                    <Button type="button" variant="outline" size="icon" className="border-green-300 hover:bg-green-50">
+                                      <Upload className="h-4 w-4 text-green-600" />
+                                    </Button>
+                                  </div>
+                                  <p className="text-xs text-green-600 mt-1">
+                                    URL del documento PDF con la respuesta a esta acción completada
+                                  </p>
+                                </div>
+                              </div>
+                            )}
                           </Card>
                         ))
                     )}

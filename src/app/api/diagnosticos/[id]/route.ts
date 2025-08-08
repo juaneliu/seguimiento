@@ -67,9 +67,12 @@ export async function PUT(
     
     if (data.nombreActividad !== undefined) updateData.nombreActividad = data.nombreActividad
     if (data.municipio !== undefined) updateData.municipio = data.municipio
+    if (data.poder !== undefined) updateData.poder = data.poder
+    if (data.organo !== undefined) updateData.organo = data.organo
     if (data.actividad !== undefined) updateData.actividad = data.actividad
     if (data.solicitudUrl !== undefined) updateData.solicitudUrl = data.solicitudUrl || null
     if (data.respuestaUrl !== undefined) updateData.respuestaUrl = data.respuestaUrl || null
+    if (data.diagnosticoUrl !== undefined) updateData.diagnosticoUrl = data.diagnosticoUrl || null
     if (data.unidadAdministrativa !== undefined) updateData.unidadAdministrativa = data.unidadAdministrativa
     if (data.evaluacion !== undefined) {
       const evaluacion = parseFloat(data.evaluacion) || 0

@@ -35,6 +35,8 @@ export async function POST(request: Request) {
     const requiredFields = [
       'nombreActividad',
       'municipio',
+      'poder',
+      'organo',
       'actividad',
       'unidadAdministrativa',
       'evaluacion'
@@ -51,9 +53,12 @@ export async function POST(request: Request) {
       data: {
         nombreActividad: data.nombreActividad,
         municipio: data.municipio,
+        poder: data.poder,
+        organo: data.organo,
         actividad: data.actividad,
         solicitudUrl: data.solicitudUrl || null,
         respuestaUrl: data.respuestaUrl || null,
+        diagnosticoUrl: data.diagnosticoUrl || null,
         unidadAdministrativa: data.unidadAdministrativa,
         evaluacion: evaluacion,
         observaciones: data.observaciones || null,
