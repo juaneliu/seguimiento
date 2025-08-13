@@ -96,7 +96,7 @@ export default function TableroDiagnosticosEntesClient({
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   
   // Permisos de edición
-  const canEdit = user?.rol === 'ADMINISTRADOR' || user?.rol === 'SEGUIMIENTO'
+  const canEdit = user?.rol === 'ADMINISTRADOR' || user?.rol === 'SEGUIMIENTO' || user?.rol === 'OPERATIVO'
 
   useEffect(() => {
     setMounted(true)
