@@ -488,7 +488,7 @@ export default function CrearDiagnosticoEntePage() {
                 href="/dashboard/diagnosticos-entes" 
                 className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
-                Diagnósticos Entes
+                Diagnósticos Entes Estatales
               </Link>
               <ChevronRight className="h-4 w-4" />
               <span className="font-medium text-blue-600 dark:text-blue-400">
@@ -499,10 +499,10 @@ export default function CrearDiagnosticoEntePage() {
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Crear diagnóstico de ente
+              Crear diagnóstico de ente estatal
             </h1>
             <p className="text-slate-600 dark:text-slate-300 text-lg">
-              Registra un nuevo diagnóstico para un ente público del estado de Morelos
+              Registra un nuevo diagnóstico para un ente estatal del estado de Morelos
             </p>
           </div>
 

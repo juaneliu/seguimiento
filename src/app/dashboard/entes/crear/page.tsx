@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { ChevronRight, Plus } from "lucide-react"
+import { ChevronRight, Plus, Trash2 } from "lucide-react"
 import { showError, showSuccess } from "@/lib/notifications"
 import { useEntes } from "@/hooks/use-entes"
 import { MUNICIPIOS_MORELOS } from "@/lib/prisma-service"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,9 +42,42 @@ const formSchema = z.object({
   sistema3: z.boolean(),
   sistema6: z.boolean(),
   municipio: z.string().optional(),
+  // Oficios de seguimiento
+  oficiosSistema1: z.array(z.object({
+    titulo: z.string(),
+    urlPdf: z.string(),
+    fechaOficio: z.date()
+  })).optional(),
+  oficiosSistema2: z.array(z.object({
+    titulo: z.string(),
+    urlPdf: z.string(),
+    fechaOficio: z.date()
+  })).optional(),
+  oficiosSistema3: z.array(z.object({
+    titulo: z.string(),
+    urlPdf: z.string(),
+    fechaOficio: z.date()
+  })).optional(),
+  oficiosSistema6: z.array(z.object({
+    titulo: z.string(),
+    urlPdf: z.string(),
+    fechaOficio: z.date()
+  })).optional(),
 })
 
 type FormData = z.infer<typeof formSchema>
+
+// Función helper para formatear fechas de manera segura para inputs
+const safeDateValue = (date: Date): string => {
+  try {
+    if (!date || isNaN(date.getTime())) {
+      return new Date().toISOString().split('T')[0]
+    }
+    return date.toISOString().split('T')[0]
+  } catch (error) {
+    return new Date().toISOString().split('T')[0]
+  }
+}
 
 export default function CrearEntePage() {
   const router = useRouter()
@@ -62,11 +96,91 @@ export default function CrearEntePage() {
       sistema3: false,
       sistema6: false,
       municipio: "",
+      oficiosSistema1: [],
+      oficiosSistema2: [],
+      oficiosSistema3: [],
+      oficiosSistema6: [],
     },
   })
 
   const watchControlOIC = form.watch("controlOIC")
   const watchControlTribunal = form.watch("controlTribunal")
+  const watchSistema1 = form.watch("sistema1")
+  const watchSistema2 = form.watch("sistema2")
+  const watchSistema3 = form.watch("sistema3")
+  const watchSistema6 = form.watch("sistema6")
+
+  // Estados para los oficios
+  const [oficiosSistema1, setOficiosSistema1] = useState<Array<{titulo: string, urlPdf: string, fechaOficio: Date}>>([])
+  const [oficiosSistema2, setOficiosSistema2] = useState<Array<{titulo: string, urlPdf: string, fechaOficio: Date}>>([])
+  const [oficiosSistema3, setOficiosSistema3] = useState<Array<{titulo: string, urlPdf: string, fechaOficio: Date}>>([])
+  const [oficiosSistema6, setOficiosSistema6] = useState<Array<{titulo: string, urlPdf: string, fechaOficio: Date}>>([])
+
+  // Función para agregar oficios
+  const agregarOficio = (sistema: 'sistema1' | 'sistema2' | 'sistema3' | 'sistema6') => {
+    const nuevoOficio = {
+      titulo: '',
+      urlPdf: '',
+      fechaOficio: new Date()
+    }
+    
+    switch(sistema) {
+      case 'sistema1':
+        setOficiosSistema1([...oficiosSistema1, nuevoOficio])
+        break
+      case 'sistema2':
+        setOficiosSistema2([...oficiosSistema2, nuevoOficio])
+        break
+      case 'sistema3':
+        setOficiosSistema3([...oficiosSistema3, nuevoOficio])
+        break
+      case 'sistema6':
+        setOficiosSistema6([...oficiosSistema6, nuevoOficio])
+        break
+    }
+  }
+
+  // Función para eliminar oficios
+  const eliminarOficio = (sistema: 'sistema1' | 'sistema2' | 'sistema3' | 'sistema6', index: number) => {
+    switch(sistema) {
+      case 'sistema1':
+        setOficiosSistema1(oficiosSistema1.filter((_: any, i: number) => i !== index))
+        break
+      case 'sistema2':
+        setOficiosSistema2(oficiosSistema2.filter((_: any, i: number) => i !== index))
+        break
+      case 'sistema3':
+        setOficiosSistema3(oficiosSistema3.filter((_: any, i: number) => i !== index))
+        break
+      case 'sistema6':
+        setOficiosSistema6(oficiosSistema6.filter((_: any, i: number) => i !== index))
+        break
+    }
+  }
+
+  // Función para actualizar oficios
+  const actualizarOficio = (sistema: 'sistema1' | 'sistema2' | 'sistema3' | 'sistema6', index: number, campo: 'titulo' | 'urlPdf' | 'fechaOficio', valor: string | Date) => {
+    const actualizarArray = (array: any[], setter: any) => {
+      const newArray = [...array]
+      newArray[index] = { ...newArray[index], [campo]: valor }
+      setter(newArray)
+    }
+
+    switch(sistema) {
+      case 'sistema1':
+        actualizarArray(oficiosSistema1, setOficiosSistema1)
+        break
+      case 'sistema2':
+        actualizarArray(oficiosSistema2, setOficiosSistema2)
+        break
+      case 'sistema3':
+        actualizarArray(oficiosSistema3, setOficiosSistema3)
+        break
+      case 'sistema6':
+        actualizarArray(oficiosSistema6, setOficiosSistema6)
+        break
+    }
+  }
   const watchAmbitoGobierno = form.watch("ambitoGobierno")
 
   // Lógica para habilitar/deshabilitar sistemas
@@ -138,12 +252,92 @@ export default function CrearEntePage() {
       }
 
       // Crear el ente usando el hook
-      await createEnte(nuevoEnte)
+      const enteCreado = await createEnte(nuevoEnte)
+      
+      // Crear oficios de seguimiento para todos los sistemas que tengan oficios
+      const oficiosPromises = []
+      
+      if (oficiosSistema1.length > 0 && oficiosSistema1.some(oficio => oficio.titulo.trim())) {
+        oficiosPromises.push(
+          ...oficiosSistema1.filter(oficio => oficio.titulo.trim()).map(oficio => 
+            fetch('/api/oficios-seguimiento', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                enteId: enteCreado.id,
+                sistema: 'sistema1',
+                titulo: oficio.titulo,
+                urlPdf: oficio.urlPdf,
+                fechaOficio: oficio.fechaOficio
+              })
+            })
+          )
+        )
+      }
+      
+      if (oficiosSistema2.length > 0 && oficiosSistema2.some(oficio => oficio.titulo.trim())) {
+        oficiosPromises.push(
+          ...oficiosSistema2.filter(oficio => oficio.titulo.trim()).map(oficio => 
+            fetch('/api/oficios-seguimiento', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                enteId: enteCreado.id,
+                sistema: 'sistema2',
+                titulo: oficio.titulo,
+                urlPdf: oficio.urlPdf,
+                fechaOficio: oficio.fechaOficio
+              })
+            })
+          )
+        )
+      }
+      
+      if (oficiosSistema3.length > 0 && oficiosSistema3.some(oficio => oficio.titulo.trim())) {
+        oficiosPromises.push(
+          ...oficiosSistema3.filter(oficio => oficio.titulo.trim()).map(oficio => 
+            fetch('/api/oficios-seguimiento', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                enteId: enteCreado.id,
+                sistema: 'sistema3',
+                titulo: oficio.titulo,
+                urlPdf: oficio.urlPdf,
+                fechaOficio: oficio.fechaOficio
+              })
+            })
+          )
+        )
+      }
+      
+      if (oficiosSistema6.length > 0 && oficiosSistema6.some(oficio => oficio.titulo.trim())) {
+        oficiosPromises.push(
+          ...oficiosSistema6.filter(oficio => oficio.titulo.trim()).map(oficio => 
+            fetch('/api/oficios-seguimiento', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                enteId: enteCreado.id,
+                sistema: 'sistema6',
+                titulo: oficio.titulo,
+                urlPdf: oficio.urlPdf,
+                fechaOficio: oficio.fechaOficio
+              })
+            })
+          )
+        )
+      }
+      
+      // Esperar a que se creen todos los oficios
+      if (oficiosPromises.length > 0) {
+        await Promise.all(oficiosPromises)
+      }
       
       // Mostrar mensaje de éxito
       await showSuccess(
         '¡Ente creado exitosamente!',
-        `El ente público "${values.nombre}" ha sido registrado correctamente.`
+        `El ente público "${values.nombre}" ha sido registrado correctamente${oficiosPromises.length > 0 ? ` con ${oficiosPromises.length} oficio(s) de seguimiento.` : '.'}`
       )
       
       // Redirigir a la lista de entes
@@ -333,30 +527,90 @@ export default function CrearEntePage() {
                   />
                 </div>
 
-                {/* Tercera fila: Sistemas */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                {/* Tercera fila: Sistemas con oficios integrados */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                   <FormField
                     control={form.control}
                     name="sistema1"
                     render={({ field }) => (
-                      <FormItem className={`flex flex-row items-center justify-between rounded-lg border-2 p-4 shadow-sm ${
+                      <FormItem className={`rounded-lg border-2 p-4 shadow-sm ${
                         field.value 
                           ? 'border-green-300/60 bg-gradient-to-r from-green-50/80 to-emerald-50/60 dark:from-green-900/20 dark:to-emerald-900/15'
                           : 'border-slate-200/50 bg-white/50 dark:bg-slate-800/50'
                       } backdrop-blur-sm`}>
-                        <div className="space-y-0.5 flex-1 mr-3">
-                          <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 1</FormLabel>
-                          <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                            Deshabilitado si el OIC está activado.
-                          </FormDescription>
+                        <div className="flex flex-row items-center justify-between mb-4">
+                          <div className="space-y-0.5 flex-1 mr-3">
+                            <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 1</FormLabel>
+                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                              Deshabilitado si el OIC está activado.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={areOtrosSistemasDisabled}
+                            />
+                          </FormControl>
                         </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={areOtrosSistemasDisabled}
-                          />
-                        </FormControl>
+
+                        {/* Oficios de Seguimiento integrados */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 border-t border-slate-200/60 dark:border-slate-600/60 pt-3">
+                            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                              Oficios de Seguimiento
+                            </h4>
+                            {!field.value && (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                Sistema desactivado
+                              </span>
+                            )}
+                          </div>
+                          
+                          {oficiosSistema1.map((oficio, index) => (
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-slate-200 rounded-lg bg-white/80 dark:bg-slate-800/80">
+                              <Input
+                                placeholder="Título del oficio"
+                                value={oficio.titulo}
+                                onChange={(e) => actualizarOficio('sistema1', index, 'titulo', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <Input
+                                placeholder="URL del PDF"
+                                value={oficio.urlPdf}
+                                onChange={(e) => actualizarOficio('sistema1', index, 'urlPdf', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="date"
+                                  value={safeDateValue(oficio.fechaOficio)}
+                                  onChange={(e) => actualizarOficio('sistema1', index, 'fechaOficio', new Date(e.target.value))}
+                                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 flex-1"
+                                />
+                                <Button 
+                                  type="button"
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => eliminarOficio('sistema1', index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => agregarOficio('sistema1')}
+                            className="w-full"
+                            size="sm"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Agregar Oficio Sistema 1
+                          </Button>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -365,24 +619,84 @@ export default function CrearEntePage() {
                     control={form.control}
                     name="sistema2"
                     render={({ field }) => (
-                      <FormItem className={`flex flex-row items-center justify-between rounded-lg border-2 p-4 shadow-sm ${
+                      <FormItem className={`rounded-lg border-2 p-4 shadow-sm ${
                         field.value 
                           ? 'border-green-300/60 bg-gradient-to-r from-green-50/80 to-emerald-50/60 dark:from-green-900/20 dark:to-emerald-900/15'
                           : 'border-slate-200/50 bg-white/50 dark:bg-slate-800/50'
                       } backdrop-blur-sm`}>
-                        <div className="space-y-0.5 flex-1 mr-3">
-                          <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 2</FormLabel>
-                          <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                            Deshabilitado si el OIC está activado.
-                          </FormDescription>
+                        <div className="flex flex-row items-center justify-between mb-4">
+                          <div className="space-y-0.5 flex-1 mr-3">
+                            <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 2</FormLabel>
+                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                              Deshabilitado si el OIC está activado.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={areOtrosSistemasDisabled}
+                            />
+                          </FormControl>
                         </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={areOtrosSistemasDisabled}
-                          />
-                        </FormControl>
+
+                        {/* Oficios de Seguimiento integrados */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 border-t border-slate-200/60 dark:border-slate-600/60 pt-3">
+                            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                              Oficios de Seguimiento
+                            </h4>
+                            {!field.value && (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                Sistema desactivado
+                              </span>
+                            )}
+                          </div>
+                          
+                          {oficiosSistema2.map((oficio, index) => (
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-slate-200 rounded-lg bg-white/80 dark:bg-slate-800/80">
+                              <Input
+                                placeholder="Título del oficio"
+                                value={oficio.titulo}
+                                onChange={(e) => actualizarOficio('sistema2', index, 'titulo', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <Input
+                                placeholder="URL del PDF"
+                                value={oficio.urlPdf}
+                                onChange={(e) => actualizarOficio('sistema2', index, 'urlPdf', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="date"
+                                  value={safeDateValue(oficio.fechaOficio)}
+                                  onChange={(e) => actualizarOficio('sistema2', index, 'fechaOficio', new Date(e.target.value))}
+                                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 flex-1"
+                                />
+                                <Button 
+                                  type="button"
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => eliminarOficio('sistema2', index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => agregarOficio('sistema2')}
+                            className="w-full"
+                            size="sm"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Agregar Oficio Sistema 2
+                          </Button>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -391,24 +705,84 @@ export default function CrearEntePage() {
                     control={form.control}
                     name="sistema3"
                     render={({ field }) => (
-                      <FormItem className={`flex flex-row items-center justify-between rounded-lg border-2 p-4 shadow-sm ${
+                      <FormItem className={`rounded-lg border-2 p-4 shadow-sm ${
                         field.value 
                           ? 'border-blue-300/60 bg-gradient-to-r from-blue-50/80 to-cyan-50/60 dark:from-blue-900/20 dark:to-cyan-900/15'
                           : 'border-slate-200/50 bg-white/50 dark:bg-slate-800/50'
                       } backdrop-blur-sm`}>
-                        <div className="space-y-0.5 flex-1 mr-3">
-                          <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 3</FormLabel>
-                          <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                            Disponible si se activa OIC o TJA.
-                          </FormDescription>
+                        <div className="flex flex-row items-center justify-between mb-4">
+                          <div className="space-y-0.5 flex-1 mr-3">
+                            <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 3</FormLabel>
+                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                              Disponible si se activa OIC o TJA.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={!isSistema3Available}
+                            />
+                          </FormControl>
                         </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!isSistema3Available}
-                          />
-                        </FormControl>
+
+                        {/* Oficios de Seguimiento integrados */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 border-t border-slate-200/60 dark:border-slate-600/60 pt-3">
+                            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                              Oficios de Seguimiento
+                            </h4>
+                            {!field.value && (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                Sistema desactivado
+                              </span>
+                            )}
+                          </div>
+                          
+                          {oficiosSistema3.map((oficio, index) => (
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-slate-200 rounded-lg bg-white/80 dark:bg-slate-800/80">
+                              <Input
+                                placeholder="Título del oficio"
+                                value={oficio.titulo}
+                                onChange={(e) => actualizarOficio('sistema3', index, 'titulo', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <Input
+                                placeholder="URL del PDF"
+                                value={oficio.urlPdf}
+                                onChange={(e) => actualizarOficio('sistema3', index, 'urlPdf', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="date"
+                                  value={safeDateValue(oficio.fechaOficio)}
+                                  onChange={(e) => actualizarOficio('sistema3', index, 'fechaOficio', new Date(e.target.value))}
+                                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 flex-1"
+                                />
+                                <Button 
+                                  type="button"
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => eliminarOficio('sistema3', index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => agregarOficio('sistema3')}
+                            className="w-full"
+                            size="sm"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Agregar Oficio Sistema 3-OIC
+                          </Button>
+                        </div>
                       </FormItem>
                     )}
                   />
@@ -417,24 +791,84 @@ export default function CrearEntePage() {
                     control={form.control}
                     name="sistema6"
                     render={({ field }) => (
-                      <FormItem className={`flex flex-row items-center justify-between rounded-lg border-2 p-4 shadow-sm ${
+                      <FormItem className={`rounded-lg border-2 p-4 shadow-sm ${
                         field.value 
                           ? 'border-green-300/60 bg-gradient-to-r from-green-50/80 to-emerald-50/60 dark:from-green-900/20 dark:to-emerald-900/15'
                           : 'border-slate-200/50 bg-white/50 dark:bg-slate-800/50'
                       } backdrop-blur-sm`}>
-                        <div className="space-y-0.5 flex-1 mr-3">
-                          <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 6</FormLabel>
-                          <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
-                            Deshabilitado si el OIC está activado.
-                          </FormDescription>
+                        <div className="flex flex-row items-center justify-between mb-4">
+                          <div className="space-y-0.5 flex-1 mr-3">
+                            <FormLabel className="text-slate-700 dark:text-slate-200 font-semibold">Sistema 6</FormLabel>
+                            <FormDescription className="text-slate-600 dark:text-slate-400 text-sm">
+                              Deshabilitado si el OIC está activado.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={areOtrosSistemasDisabled}
+                            />
+                          </FormControl>
                         </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={areOtrosSistemasDisabled}
-                          />
-                        </FormControl>
+
+                        {/* Oficios de Seguimiento integrados */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 border-t border-slate-200/60 dark:border-slate-600/60 pt-3">
+                            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                              Oficios de Seguimiento
+                            </h4>
+                            {!field.value && (
+                              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                Sistema desactivado
+                              </span>
+                            )}
+                          </div>
+                          
+                          {oficiosSistema6.map((oficio, index) => (
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border border-slate-200 rounded-lg bg-white/80 dark:bg-slate-800/80">
+                              <Input
+                                placeholder="Título del oficio"
+                                value={oficio.titulo}
+                                onChange={(e) => actualizarOficio('sistema6', index, 'titulo', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <Input
+                                placeholder="URL del PDF"
+                                value={oficio.urlPdf}
+                                onChange={(e) => actualizarOficio('sistema6', index, 'urlPdf', e.target.value)}
+                                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60"
+                              />
+                              <div className="flex gap-2">
+                                <Input
+                                  type="date"
+                                  value={safeDateValue(oficio.fechaOficio)}
+                                  onChange={(e) => actualizarOficio('sistema6', index, 'fechaOficio', new Date(e.target.value))}
+                                  className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60 flex-1"
+                                />
+                                <Button 
+                                  type="button"
+                                  variant="destructive" 
+                                  size="sm"
+                                  onClick={() => eliminarOficio('sistema6', index)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <Button 
+                            type="button"
+                            variant="outline" 
+                            onClick={() => agregarOficio('sistema6')}
+                            className="w-full"
+                            size="sm"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Agregar Oficio Sistema 6
+                          </Button>
+                        </div>
                       </FormItem>
                     )}
                   />

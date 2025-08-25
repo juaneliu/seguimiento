@@ -563,10 +563,10 @@ function DiagnosticosEntesContent() {
           <div className="flex items-center justify-between space-y-2">
             <div>
               <h2 className="text-3xl font-bold tracking-tight">
-                Diagnósticos Entes
+                Diagnósticos Entes Estatales
               </h2>
               <p className="text-muted-foreground">
-                Monitorea el estado y avance de los diagnósticos por ente público
+                Monitorea el estado y avance de los diagnósticos por ente estatal
               </p>
             </div>
           </div>

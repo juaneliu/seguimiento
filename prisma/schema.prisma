@@ -106,6 +106,24 @@ model entes_publicos {
   createdAt            DateTime               @default(now())
   updatedAt            DateTime
   directorio_oic_entes directorio_oic_entes[]
+  oficios_seguimiento  oficios_seguimiento[]
+}
+
+model oficios_seguimiento {
+  id            Int            @id @default(autoincrement())
+  enteId        Int
+  sistema       String         // "sistema1", "sistema2", "sistema3", "sistema6"
+  titulo        String
+  descripcion   String?
+  urlPdf        String
+  fechaOficio   DateTime
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  creadoPor     String?
+  ente          entes_publicos @relation(fields: [enteId], references: [id], onDelete: Cascade)
+
+  @@index([enteId])
+  @@index([sistema])
 }
 
 model seguimientos {

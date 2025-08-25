@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { 
   Plus, 
@@ -17,7 +18,13 @@ import {
   Trash2, 
   MoreHorizontal,
   CheckCircle,
-  XCircle
+  XCircle,
+  FileText,
+  ExternalLink,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Loader2
 } from "lucide-react"
 import { showError, showSuccess, showConfirm } from "@/lib/notifications"
 import { useEntes } from "@/hooks/use-entes"
@@ -41,10 +48,46 @@ function EntesPageContent() {
   const { user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [activeView, setActiveView] = useState('sujetos-obligados')
+  const [sistemaFilter, setSistemaFilter] = useState('sistema1')
+  
+  // Estado para filas expandidas de oficios
+  const [entesExpandidos, setEntesExpandidos] = useState<{[key: string]: {
+    ente: any,
+    sistema: string,
+    oficios: any[],
+    loading: boolean
+  }}>({})
+  const [loadingOficios, setLoadingOficios] = useState(false)
   
   // Timestamp para invalidar caché del navegador
   const [buildTime] = useState(() => Date.now())
   
+  // Función para verificar si un ente tiene el sistema seleccionado
+  const hasSelectedSystem = (ente: any) => {
+    switch (sistemaFilter) {
+      case 'sistema1': return ente.sistema1 === true
+      case 'sistema2': return ente.sistema2 === true
+      case 'sistema3': return ente.sistema3 === true
+      case 'sistema6': return ente.sistema6 === true
+      default: return false
+    }
+  }
+
+  // Función para calcular porcentaje de cumplimiento
+  const calculatePercentage = (poder: string, ambito?: string) => {
+    const filteredEntes = entes.filter(e => {
+      if (ambito) {
+        return e.poderGobierno === poder && e.ambitoGobierno === ambito
+      }
+      return e.poderGobierno === poder
+    })
+    
+    if (filteredEntes.length === 0) return 0
+    
+    const withSystems = filteredEntes.filter(hasSelectedSystem).length
+    return Math.round((withSystems / filteredEntes.length) * 100)
+  }
+
   // Verificar si el usuario puede editar/eliminar
   const canEdit = user?.rol !== 'INVITADO'
   
@@ -88,6 +131,61 @@ function EntesPageContent() {
         const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
         await showError('Error', `No se pudo eliminar el ente: ${errorMessage}`)
       }
+    }
+  }
+
+  // Función para expandir/contraer oficios de un ente (solo uno a la vez)
+  const handleToggleOficios = async (ente: any, sistema: string) => {
+    const key = `${ente.id}-${sistema}`
+    
+    // Si ya está expandido, contraer
+    if (entesExpandidos[key]) {
+      setEntesExpandidos({})
+      return
+    }
+    
+    // Contraer todos los demás y expandir solo el seleccionado
+    setEntesExpandidos({
+      [key]: {
+        ente,
+        sistema,
+        oficios: [],
+        loading: true
+      }
+    })
+    
+    try {
+      const response = await fetch(`/api/oficios-seguimiento?enteId=${ente.id}&sistema=${sistema}`)
+      if (response.ok) {
+        const data = await response.json()
+        setEntesExpandidos({
+          [key]: {
+            ente,
+            sistema,
+            oficios: data,
+            loading: false
+          }
+        })
+      } else {
+        setEntesExpandidos({
+          [key]: {
+            ente,
+            sistema,
+            oficios: [],
+            loading: false
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Error cargando oficios:', error)
+      setEntesExpandidos({
+        [key]: {
+          ente,
+          sistema,
+          oficios: [],
+          loading: false
+        }
+      })
     }
   }
 
@@ -189,6 +287,192 @@ function EntesPageContent() {
           </div>
           
           <DatabaseStatus />
+
+          {/* Estadísticas de Cumplimiento por Poder/Ámbito */}
+          <Card className="bg-white flex flex-col min-h-[400px]">
+            <CardHeader className="pb-2 sm:pb-4 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base sm:text-lg font-semibold text-slate-900 tracking-wide flex items-center gap-2">
+                    <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
+                    Porcentaje de Cumplimiento de Sistemas por Poder/Ámbito
+                  </CardTitle>
+                  <CardDescription className="text-[10px] sm:text-xs text-slate-500 tracking-wide">
+                    Última actualización: {new Date().toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'long', 
+                      year: 'numeric'
+                    })}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pl-0 sm:pl-2 flex-1 flex flex-col">
+              <div className="space-y-6 p-4">
+                {/* Filtro de sistema */}
+                <div className="flex justify-end">
+                  <select 
+                    value={sistemaFilter}
+                    onChange={(e) => setSistemaFilter(e.target.value)}
+                    className="px-3 py-2 border border-slate-300 rounded-md bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="sistema1">Sistema 1</option>
+                    <option value="sistema2">Sistema 2</option>
+                    <option value="sistema3">Sistema 3</option>
+                    <option value="sistema6">Sistema 6</option>
+                  </select>
+                </div>
+
+                {/* Gráfico de barras */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {/* Ejecutivo */}
+                  <div className="space-y-2">
+                    <div className="h-48 bg-slate-50 rounded-lg relative overflow-hidden shadow-sm border border-slate-100">
+                      <div className="absolute inset-0 w-full flex flex-col">
+                        {/* Barra de no cumplimiento (parte superior - rojo) */}
+                        <div 
+                          className="bg-gradient-to-t from-red-500 to-red-400 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${100 - calculatePercentage('Ejecutivo', 'Estatal')}%`
+                          }}
+                        />
+                        {/* Barra de cumplimiento (parte inferior - verde) */}
+                        <div 
+                          className="bg-gradient-to-t from-emerald-600 to-emerald-500 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${calculatePercentage('Ejecutivo', 'Estatal')}%`
+                          }}
+                        />
+                      </div>
+                      {/* Porcentaje */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg drop-shadow-lg">
+                          {calculatePercentage('Ejecutivo', 'Estatal')}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-center text-slate-700">Ejecutivo</p>
+                  </div>
+
+                  {/* Legislativo */}
+                  <div className="space-y-2">
+                    <div className="h-48 bg-slate-50 rounded-lg relative overflow-hidden shadow-sm border border-slate-100">
+                      <div className="absolute inset-0 w-full flex flex-col">
+                        <div 
+                          className="bg-gradient-to-t from-red-500 to-red-400 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${100 - calculatePercentage('Legislativo')}%`
+                          }}
+                        />
+                        <div 
+                          className="bg-gradient-to-t from-emerald-600 to-emerald-500 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${calculatePercentage('Legislativo')}%`
+                          }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg drop-shadow-lg">
+                          {calculatePercentage('Legislativo')}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-center text-slate-700">Legislativo</p>
+                  </div>
+
+                  {/* Judicial */}
+                  <div className="space-y-2">
+                    <div className="h-48 bg-slate-50 rounded-lg relative overflow-hidden shadow-sm border border-slate-100">
+                      <div className="absolute inset-0 w-full flex flex-col">
+                        <div 
+                          className="bg-gradient-to-t from-red-500 to-red-400 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${100 - calculatePercentage('Judicial')}%`
+                          }}
+                        />
+                        <div 
+                          className="bg-gradient-to-t from-emerald-600 to-emerald-500 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${calculatePercentage('Judicial')}%`
+                          }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg drop-shadow-lg">
+                          {calculatePercentage('Judicial')}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-center text-slate-700">Judicial</p>
+                  </div>
+
+                  {/* Autónomo (OCA) */}
+                  <div className="space-y-2">
+                    <div className="h-48 bg-slate-50 rounded-lg relative overflow-hidden shadow-sm border border-slate-100">
+                      <div className="absolute inset-0 w-full flex flex-col">
+                        <div 
+                          className="bg-gradient-to-t from-red-500 to-red-400 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${100 - calculatePercentage('Autónomo')}%`
+                          }}
+                        />
+                        <div 
+                          className="bg-gradient-to-t from-emerald-600 to-emerald-500 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${calculatePercentage('Autónomo')}%`
+                          }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg drop-shadow-lg">
+                          {calculatePercentage('Autónomo')}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-center text-slate-700">OCA</p>
+                  </div>
+
+                  {/* Ejecutivo Municipal */}
+                  <div className="space-y-2">
+                    <div className="h-48 bg-slate-50 rounded-lg relative overflow-hidden shadow-sm border border-slate-100">
+                      <div className="absolute inset-0 w-full flex flex-col">
+                        <div 
+                          className="bg-gradient-to-t from-red-500 to-red-400 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${100 - calculatePercentage('Ejecutivo', 'Municipal')}%`
+                          }}
+                        />
+                        <div 
+                          className="bg-gradient-to-t from-emerald-600 to-emerald-500 w-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            height: `${calculatePercentage('Ejecutivo', 'Municipal')}%`
+                          }}
+                        />
+                      </div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-white font-semibold text-lg drop-shadow-lg">
+                          {calculatePercentage('Ejecutivo', 'Municipal')}%
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium text-center text-slate-700">Ejecutivo Municipal</p>
+                  </div>
+                </div>
+
+                {/* Leyenda */}
+                <div className="flex justify-center gap-6 pt-4 border-t border-slate-200">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-t from-emerald-600 to-emerald-500 rounded shadow-sm"></div>
+                    <span className="text-sm font-medium text-slate-700">Interconectados</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-gradient-to-t from-red-500 to-red-400 rounded shadow-sm"></div>
+                    <span className="text-sm font-medium text-slate-700">No conectados</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           {/* Navegación - Pestañas Responsivas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -301,7 +585,13 @@ function EntesPageContent() {
                       <p className="text-sm sm:text-base text-slate-600">No hay sujetos obligados registrados aún.</p>
                     </div>
                   ) : (
-                    <TablaSujetosObligados entes={sujetosObligados} onEliminar={handleEliminarEnte} canEdit={canEdit} />
+                    <TablaSujetosObligados 
+                      entes={sujetosObligados} 
+                      onEliminar={handleEliminarEnte} 
+                      onToggleOficios={handleToggleOficios}
+                      entesExpandidos={entesExpandidos}
+                      canEdit={canEdit} 
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -329,7 +619,13 @@ function EntesPageContent() {
                       <p className="text-slate-600 dark:text-slate-400">No hay autoridades resolutoras registradas aún.</p>
                     </div>
                   ) : (
-                    <TablaAutoridadesResolutoras entes={autoridadesResolutoras} onEliminar={handleEliminarEnte} canEdit={canEdit} />
+                    <TablaAutoridadesResolutoras 
+                      entes={autoridadesResolutoras} 
+                      onEliminar={handleEliminarEnte} 
+                      onToggleOficios={handleToggleOficios}
+                      entesExpandidos={entesExpandidos}
+                      canEdit={canEdit} 
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -342,7 +638,13 @@ function EntesPageContent() {
 }
 
 // Componente para la tabla de Sujetos Obligados - Responsive
-const TablaSujetosObligados = ({ entes, onEliminar, canEdit }: { entes: any[], onEliminar: (id: number, nombre: string) => void, canEdit: boolean }) => (
+const TablaSujetosObligados = ({ entes, onEliminar, onToggleOficios, entesExpandidos, canEdit }: { 
+  entes: any[], 
+  onEliminar: (id: number, nombre: string) => void, 
+  onToggleOficios: (ente: any, sistema: string) => void,
+  entesExpandidos: {[key: string]: {ente: any, sistema: string, oficios: any[], loading: boolean}},
+  canEdit: boolean 
+}) => (
   <>
     {/* Vista desktop */}
     <div className="hidden lg:block overflow-x-auto">
@@ -362,84 +664,169 @@ const TablaSujetosObligados = ({ entes, onEliminar, canEdit }: { entes: any[], o
         </thead>
         <tbody>
           {entes.map((ente) => (
-            <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
-              <td className="p-3 lg:p-4">
-                <div>
-                  <div className="font-medium text-sm lg:text-base text-slate-900 dark:text-slate-100">{ente.nombre}</div>
-                  {ente.municipio && (
-                    <div className="text-xs lg:text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
-                  )}
-                  <div className="text-xs text-slate-500 dark:text-slate-500">{ente.entidad.nombre}</div>
-                </div>
-              </td>
-              <td className="p-3 lg:p-4 text-center">
-                <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
-              </td>
-              <td className="p-3 lg:p-4 text-center">
-                <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
-              </td>
-              <td className="p-3 lg:p-4 text-center">
-                {ente.sistema1 ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
+            <>
+              <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60 hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
+                <td className="p-3 lg:p-4">
+                  <div>
+                    <div className="font-medium text-sm lg:text-base text-slate-900 dark:text-slate-100">{ente.nombre}</div>
+                    {ente.municipio && (
+                      <div className="text-xs lg:text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
+                    )}
+                    <div className="text-xs text-slate-500 dark:text-slate-500">{ente.entidad.nombre}</div>
                   </div>
-                ) : (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
-                  </div>
-                )}
-              </td>
-              <td className="p-3 lg:p-4 text-center">
-                {ente.sistema2 ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
-                  </div>
-                )}
-              </td>
-              <td className="p-3 lg:p-4 text-center">
-                {ente.sistema6 ? (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full">
-                    <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
-                  </div>
-                )}
-              </td>
-              {canEdit && (
-                <td className="p-3 lg:p-4 text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <span className="sr-only">Abrir menú</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60">
-                      <DropdownMenuLabel className="text-slate-700 dark:text-slate-300">Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/entes/editar/${ente.id}`} className="flex items-center cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-700">
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => onEliminar(ente.id!, ente.nombre)}
-                        className="text-red-600 focus:text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </td>
-              )}
-            </tr>
+                <td className="p-3 lg:p-4 text-center">
+                  <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
+                </td>
+                <td className="p-3 lg:p-4 text-center">
+                  <div className="text-xs lg:text-sm text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
+                </td>
+                <td className="p-3 lg:p-4 text-center">
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema1')}
+                    className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 rounded-full transition-all hover:scale-110 cursor-pointer"
+                    title={`Ver oficios de seguimiento - Sistema 1`}
+                  >
+                    {ente.sistema1 ? (
+                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full flex items-center justify-center">
+                        <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
+                      </div>
+                    )}
+                  </button>
+                </td>
+                <td className="p-3 lg:p-4 text-center">
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema2')}
+                    className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 rounded-full transition-all hover:scale-110 cursor-pointer"
+                    title={`Ver oficios de seguimiento - Sistema 2`}
+                  >
+                    {ente.sistema2 ? (
+                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full flex items-center justify-center">
+                        <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
+                      </div>
+                    )}
+                  </button>
+                </td>
+                <td className="p-3 lg:p-4 text-center">
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema6')}
+                    className="inline-flex items-center justify-center w-6 h-6 lg:w-8 lg:h-8 rounded-full transition-all hover:scale-110 cursor-pointer"
+                    title={`Ver oficios de seguimiento - Sistema 6`}
+                  >
+                    {ente.sistema6 ? (
+                      <div className="w-full h-full bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-300 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full flex items-center justify-center">
+                        <XCircle className="h-3 w-3 lg:h-4 lg:w-4 text-red-600" />
+                      </div>
+                    )}
+                  </button>
+                </td>
+                {canEdit && (
+                  <td className="p-3 lg:p-4 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-700">
+                          <span className="sr-only">Abrir menú</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60">
+                        <DropdownMenuLabel className="text-slate-700 dark:text-slate-300">Acciones</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/entes/editar/${ente.id}`} className="flex items-center cursor-pointer hover:bg-blue-50 dark:hover:bg-slate-700">
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => onEliminar(ente.id!, ente.nombre)}
+                          className="text-red-600 focus:text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                )}
+              </tr>
+              
+              {/* Filas expandidas para oficios de seguimiento */}
+              {Object.entries(entesExpandidos).map(([key, expanded]) => {
+                if (!key.startsWith(`${ente.id}-`)) return null
+                
+                const sistema = expanded.sistema
+                const colSpan = canEdit ? 7 : 6
+                
+                return (
+                  <tr key={key} className="bg-slate-50/50 dark:bg-slate-800/50">
+                    <td colSpan={colSpan} className="p-4 border-b border-slate-200/60 dark:border-slate-600/60">
+                      <div className="flex items-center gap-2 mb-3">
+                        <button
+                          onClick={() => onToggleOficios(ente, sistema)}
+                          className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                          Oficios de Seguimiento - {sistema.charAt(0).toUpperCase() + sistema.slice(1)}
+                        </button>
+                      </div>
+                      
+                      {expanded.loading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                          <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">Cargando oficios...</span>
+                        </div>
+                      ) : expanded.oficios.length === 0 ? (
+                        <div className="text-center py-4">
+                          <FileText className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+                          <p className="text-sm text-slate-600 dark:text-slate-400">No hay oficios de seguimiento registrados para este sistema.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {expanded.oficios.map((oficio: any) => (
+                            <div key={oficio.id} className="bg-white dark:bg-slate-700 rounded-lg p-4 border border-slate-200/60 dark:border-slate-600/60 shadow-sm">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100 mb-1">{oficio.titulo}</h4>
+                                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
+                                    Fecha: {new Date(oficio.fechaOficio).toLocaleDateString('es-ES')}
+                                  </p>
+                                  {oficio.descripcion && (
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">{oficio.descripcion}</p>
+                                  )}
+                                </div>
+                                {oficio.urlPdf && (
+                                  <a
+                                    href={oficio.urlPdf}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Ver PDF
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </>
           ))}
         </tbody>
       </table>
@@ -467,39 +854,57 @@ const TablaSujetosObligados = ({ entes, onEliminar, canEdit }: { entes: any[], o
               <div className="flex items-center gap-3 sm:gap-4 mt-2">
                 <div className="flex items-center gap-1">
                   <span className="text-xs font-medium text-slate-700 dark:text-slate-300">S1:</span>
-                  {ente.sistema1 ? (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
-                      <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
-                      <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
-                    </div>
-                  )}
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema1')}
+                    className="transition-all hover:scale-110 cursor-pointer"
+                    title="Ver oficios de seguimiento - Sistema 1"
+                  >
+                    {ente.sistema1 ? (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
+                        <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
+                        <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
+                      </div>
+                    )}
+                  </button>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-xs font-medium text-slate-700 dark:text-slate-300">S2:</span>
-                  {ente.sistema2 ? (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
-                      <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
-                      <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
-                    </div>
-                  )}
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema2')}
+                    className="transition-all hover:scale-110 cursor-pointer"
+                    title="Ver oficios de seguimiento - Sistema 2"
+                  >
+                    {ente.sistema2 ? (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
+                        <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
+                        <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
+                      </div>
+                    )}
+                  </button>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="text-xs font-medium text-slate-700 dark:text-slate-300">S6:</span>
-                  {ente.sistema6 ? (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
-                      <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
-                      <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
-                    </div>
-                  )}
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema6')}
+                    className="transition-all hover:scale-110 cursor-pointer"
+                    title="Ver oficios de seguimiento - Sistema 6"
+                  >
+                    {ente.sistema6 ? (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-green-100 to-emerald-100 border border-green-300 rounded-full">
+                        <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-br from-red-100 to-rose-100 border border-red-300 rounded-full">
+                        <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-red-600" />
+                      </div>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
@@ -543,7 +948,13 @@ const TablaSujetosObligados = ({ entes, onEliminar, canEdit }: { entes: any[], o
 )
 
 // Componente para la tabla de Autoridades Resolutoras - Responsive
-const TablaAutoridadesResolutoras = ({ entes, onEliminar, canEdit }: { entes: any[], onEliminar: (id: number, nombre: string) => void, canEdit: boolean }) => (
+const TablaAutoridadesResolutoras = ({ entes, onEliminar, onToggleOficios, entesExpandidos, canEdit }: { 
+  entes: any[], 
+  onEliminar: (id: number, nombre: string) => void, 
+  onToggleOficios: (ente: any, sistema: string) => void,
+  entesExpandidos: {[key: string]: {ente: any, sistema: string, oficios: any[], loading: boolean}},
+  canEdit: boolean 
+}) => (
   <>
     {/* Vista desktop */}
     <div className="hidden lg:block overflow-x-auto">
@@ -561,62 +972,135 @@ const TablaAutoridadesResolutoras = ({ entes, onEliminar, canEdit }: { entes: an
         </thead>
         <tbody>
           {entes.map((ente) => (
-            <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60">
-              <td className="p-4">
-                <div>
-                  <div className="font-medium text-slate-900 dark:text-slate-100">{ente.nombre}</div>
-                  {ente.municipio && (
-                    <div className="text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
-                  )}
-                  <div className="text-xs text-slate-500 dark:text-slate-500">{ente.entidad.nombre}</div>
-                </div>
-              </td>
-              <td className="p-4 text-center">
-                <div className="text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
-              </td>
-              <td className="p-4 text-center">
-                <div className="text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
-              </td>
-              <td className="p-4 text-center">
-                {ente.sistema3 ? (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300 rounded-full">
-                    <CheckCircle className="h-4 w-4 text-blue-600" />
+            <>
+              <tr key={ente.id} className="border-b border-slate-100/60 dark:border-slate-700/60">
+                <td className="p-4">
+                  <div>
+                    <div className="font-medium text-slate-900 dark:text-slate-100">{ente.nombre}</div>
+                    {ente.municipio && (
+                      <div className="text-sm text-slate-600 dark:text-slate-400">{ente.municipio}</div>
+                    )}
+                    <div className="text-xs text-slate-500 dark:text-slate-500">{ente.entidad.nombre}</div>
                   </div>
-                ) : (
-                  <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full">
-                    <XCircle className="h-4 w-4 text-red-600" />
-                  </div>
-                )}
-              </td>
-              {canEdit && (
-                <td className="p-4 text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <span className="sr-only">Abrir menú</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60">
-                      <DropdownMenuLabel className="text-slate-700 dark:text-slate-300">Acciones</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/entes/editar/${ente.id}`} className="flex items-center cursor-pointer hover:bg-green-50 dark:hover:bg-slate-700">
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => onEliminar(ente.id!, ente.nombre)}
-                        className="text-red-600 focus:text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </td>
-              )}
-            </tr>
+                <td className="p-4 text-center">
+                  <div className="text-slate-700 dark:text-slate-300">{ente.poderGobierno}</div>
+                </td>
+                <td className="p-4 text-center">
+                  <div className="text-slate-700 dark:text-slate-300">{ente.ambitoGobierno}</div>
+                </td>
+                <td className="p-4 text-center">
+                  <button
+                    onClick={() => onToggleOficios(ente, 'sistema3')}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full transition-all hover:scale-110 cursor-pointer"
+                    title={`Ver oficios de seguimiento - Sistema 3`}
+                  >
+                    {ente.sistema3 ? (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-indigo-100 border-2 border-blue-300 rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                      </div>
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-red-100 to-rose-100 border-2 border-red-300 rounded-full flex items-center justify-center">
+                        <XCircle className="h-4 w-4 text-red-600" />
+                      </div>
+                    )}
+                  </button>
+                </td>
+                {canEdit && (
+                  <td className="p-4 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-700">
+                          <span className="sr-only">Abrir menú</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-600/60">
+                        <DropdownMenuLabel className="text-slate-700 dark:text-slate-300">Acciones</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/entes/editar/${ente.id}`} className="flex items-center cursor-pointer hover:bg-green-50 dark:hover:bg-slate-700">
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => onEliminar(ente.id!, ente.nombre)}
+                          className="text-red-600 focus:text-red-600 cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                )}
+              </tr>
+              
+              {/* Filas expandidas para oficios de seguimiento */}
+              {Object.entries(entesExpandidos).map(([key, expanded]) => {
+                if (!key.startsWith(`${ente.id}-`)) return null
+                
+                const sistema = expanded.sistema
+                const colSpan = canEdit ? 5 : 4
+                
+                return (
+                  <tr key={key} className="bg-slate-50/50 dark:bg-slate-800/50">
+                    <td colSpan={colSpan} className="p-4 border-b border-slate-200/60 dark:border-slate-600/60">
+                      <div className="flex items-center gap-2 mb-3">
+                        <button
+                          onClick={() => onToggleOficios(ente, sistema)}
+                          className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-green-600 dark:hover:text-green-400"
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                          Oficios de Seguimiento - {sistema.charAt(0).toUpperCase() + sistema.slice(1)}
+                        </button>
+                      </div>
+                      
+                      {expanded.loading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-5 w-5 animate-spin text-green-600" />
+                          <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">Cargando oficios...</span>
+                        </div>
+                      ) : expanded.oficios.length === 0 ? (
+                        <div className="text-center py-4">
+                          <FileText className="h-8 w-8 mx-auto mb-2 text-slate-400" />
+                          <p className="text-sm text-slate-600 dark:text-slate-400">No hay oficios de seguimiento registrados para este sistema.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {expanded.oficios.map((oficio: any) => (
+                            <div key={oficio.id} className="bg-white dark:bg-slate-700 rounded-lg p-4 border border-slate-200/60 dark:border-slate-600/60 shadow-sm">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100 mb-1">{oficio.titulo}</h4>
+                                  <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
+                                    Fecha: {new Date(oficio.fechaOficio).toLocaleDateString('es-ES')}
+                                  </p>
+                                  {oficio.descripcion && (
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">{oficio.descripcion}</p>
+                                  )}
+                                </div>
+                                {oficio.urlPdf && (
+                                  <a
+                                    href={oficio.urlPdf}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 text-xs text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Ver PDF
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </>
           ))}
         </tbody>
       </table>

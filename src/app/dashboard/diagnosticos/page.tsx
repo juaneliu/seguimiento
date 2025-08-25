@@ -256,7 +256,7 @@ function DiagnosticosMunicipiosContent() {
               <CardContent className="py-1 px-3">
                 <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">{municipiosUnicosCount}</div>
                 <p className="text-xs text-purple-700 dark:text-purple-300 font-medium">
-                  municipios capturados
+                  entes municipales capturados
                 </p>
               </CardContent>
             </Card>

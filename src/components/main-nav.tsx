@@ -34,7 +34,7 @@ const items: NavItem[] = [
     icon: FileText,
   },
   {
-    title: "Diagnósticos Entes",
+    title: "Diagnósticos Entes Estatales",
     href: "/dashboard/diagnosticos-entes",
     icon: Building2,
   },
@@ -118,7 +118,7 @@ export function MainNav() {
         roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
       },
       {
-        title: "Diagnósticos Entes",
+        title: "Diagnósticos Entes Estatales",
         href: "/dashboard/diagnosticos-entes",
         icon: Building2,
         roles: ['INVITADO', 'OPERATIVO', 'ADMINISTRADOR', 'SEGUIMIENTO']
