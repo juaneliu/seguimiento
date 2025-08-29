@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { formatDateForInput, formatFechaEspanol, calcularDiasRestantes } from '@/lib/date-utils'
+import { TextWithLinks } from '@/lib/text-utils'
 import { 
   Calendar,
   FileText, 
@@ -261,45 +263,11 @@ export function TableroAcuerdos() {
     }
   }
 
-  // Función para formatear fecha sin problemas de zona horaria
-  const formatFecha = (fecha: string | Date) => {
-    const date = new Date(fecha)
-    // Verificar si es una fecha válida
-    if (isNaN(date.getTime())) return 'Fecha inválida'
-    
-    // Usar getFullYear, getMonth, getDate para evitar problemas de zona horaria
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const day = date.getDate()
-    
-    const monthNames = [
-      'ene', 'feb', 'mar', 'abr', 'may', 'jun',
-      'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
-    ]
-    
-    return `${day} ${monthNames[month]} ${year}`
-  }
+  // Función para formatear fecha usando utilidades centralizadas
+  const formatFecha = formatFechaEspanol
 
-  // Función para calcular días restantes sin problemas de zona horaria
-  const diasRestantes = (fechaCompromiso: string | Date) => {
-    const hoy = new Date()
-    hoy.setHours(0, 0, 0, 0) // Normalizar a medianoche
-    
-    const compromiso = new Date(fechaCompromiso)
-    compromiso.setHours(0, 0, 0, 0) // Normalizar a medianoche
-    
-    const diferencia = Math.ceil((compromiso.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24))
-    
-    if (diferencia < 0) {
-      return { texto: `${Math.abs(diferencia)} días de retraso`, clase: "text-red-600" }
-    } else if (diferencia === 0) {
-      return { texto: "Vence hoy", clase: "text-orange-600 font-medium" }
-    } else if (diferencia <= 7) {
-      return { texto: `${diferencia} días restantes`, clase: "text-yellow-600 font-medium" }
-    } else {
-      return { texto: `${diferencia} días restantes`, clase: "text-green-600" }
-    }
-  }
+  // Función para calcular días restantes usando utilidades centralizadas
+  const diasRestantes = calcularDiasRestantes
 
   // Funciones de manejo de modales
 
@@ -731,8 +699,11 @@ export function TableroAcuerdos() {
                                   </div>
                                 </td>
                                 <td className="p-4 align-middle">
-                                  <div className="text-sm text-slate-600 dark:text-slate-400 max-w-xs break-words break-all">
-                                    {acuerdo.observaciones || '-'}
+                                  <div className="text-sm text-slate-600 dark:text-slate-400 max-w-xs break-words">
+                                    <TextWithLinks 
+                                      text={acuerdo.observaciones || '-'} 
+                                      maxLength={100}
+                                    />
                                   </div>
                                 </td>
                               </tr>
@@ -854,8 +825,12 @@ export function TableroAcuerdos() {
                                     </div>
                                   </div>
                                   {acuerdo.observaciones && (
-                                    <div className="max-w-[100px] text-slate-600 dark:text-slate-400 truncate">
-                                      {acuerdo.observaciones}
+                                    <div className="max-w-[100px] text-slate-600 dark:text-slate-400">
+                                      <TextWithLinks 
+                                        text={acuerdo.observaciones} 
+                                        maxLength={50}
+                                        className="truncate block"
+                                      />
                                     </div>
                                   )}
                                 </div>
@@ -1094,7 +1069,10 @@ export function TableroAcuerdos() {
                     <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4" />
                     Observaciones
                   </Label>
-                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1 leading-relaxed break-words break-all">{selectedAcuerdo.observaciones}</p>
+                  <TextWithLinks 
+                    text={selectedAcuerdo.observaciones} 
+                    className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1 leading-relaxed break-words" 
+                  />
                 </div>
               )}
 
@@ -1145,15 +1123,17 @@ export function TableroAcuerdos() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mb-2 leading-relaxed break-words">
-                              {seguimiento.seguimiento}
-                            </p>
+                            <TextWithLinks 
+                              text={seguimiento.seguimiento}
+                              className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 mb-2 leading-relaxed break-words"
+                            />
                             {seguimiento.accion && (
                               <div className="p-2 bg-green-50/80 dark:bg-green-900/20 rounded border border-green-200/40 dark:border-green-700/40">
                                 <Label className="text-xs font-medium text-green-800 dark:text-green-300">Acción realizada:</Label>
-                                <p className="text-xs text-green-700 dark:text-green-400 mt-1 leading-relaxed break-words">
-                                  {seguimiento.accion}
-                                </p>
+                                <TextWithLinks 
+                                  text={seguimiento.accion}
+                                  className="text-xs text-green-700 dark:text-green-400 mt-1 leading-relaxed break-words"
+                                />
                               </div>
                             )}
                           </div>
@@ -1318,14 +1298,7 @@ interface FormularioEdicionAcuerdoProps {
 
 function FormularioEdicionAcuerdo({ acuerdo, onSave, onCancel }: FormularioEdicionAcuerdoProps) {
   // Función helper para formatear fechas para input sin problemas de zona horaria
-  const formatDateForInput = (dateValue: string | Date) => {
-    if (!dateValue) return ''
-    const date = new Date(dateValue)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
+  // Usar la utilidad centralizada de date-utils
 
   const [formData, setFormData] = useState({
     numeroSesion: acuerdo.numeroSesion || '',

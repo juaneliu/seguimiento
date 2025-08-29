@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma-service'
+import { createLocalDate } from '@/lib/date-utils'
 
 // GET - Obtener todos los acuerdos
 export async function GET() {
@@ -27,12 +28,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json()
-    
-    // Función helper para crear fechas locales sin problemas de zona horaria
-    const createLocalDate = (dateString: string) => {
-      const [year, month, day] = dateString.split('-').map(Number)
-      return new Date(year, month - 1, day) // month - 1 porque Date usa 0-indexing para meses
-    }
     
     const acuerdo = await prisma.acuerdos_seguimiento.create({
       data: {

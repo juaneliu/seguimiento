@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { TextWithLinks } from '@/lib/text-utils'
 import { 
   Plus, 
   Edit2, 
@@ -277,17 +278,19 @@ export function SeguimientosList({ acuerdoId, acuerdoTema }: SeguimientosListPro
                       <div className="flex items-start gap-2">
                         <MessageSquare className="h-4 w-4 text-slate-500 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                            {seguimiento.seguimiento}
-                          </p>
+                          <TextWithLinks 
+                            text={seguimiento.seguimiento}
+                            className="text-sm font-medium text-slate-800 dark:text-slate-200"
+                          />
                         </div>
                       </div>
                       <div className="flex items-start gap-2">
                         <Activity className="h-4 w-4 text-slate-500 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
-                            {seguimiento.accion}
-                          </p>
+                          <TextWithLinks 
+                            text={seguimiento.accion}
+                            className="text-sm text-slate-600 dark:text-slate-400"
+                          />
                         </div>
                       </div>
                     </div>

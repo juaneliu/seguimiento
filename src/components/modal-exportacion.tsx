@@ -3,6 +3,7 @@
 import React from 'react'
 import { X, FileText } from 'lucide-react'
 import { AcuerdoSeguimiento } from '@/hooks/use-acuerdos-seguimiento'
+import { formatFechaLocalUTC } from '@/lib/date-utils'
 
 interface ModalExportacionProps {
   isOpen: boolean
@@ -59,17 +60,17 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
           excelData.push({
             'Número': `Acuerdo ${(sessionIndex + 1).toString().padStart(2, '0')}`,
             'Sesión': `${acuerdo.tipoSesion} ${acuerdo.numeroSesion}`,
-            'Fecha Sesión': new Date(acuerdo.fechaSesion).toLocaleDateString('es-MX'),
+            'Fecha Sesión': formatFechaLocalUTC(acuerdo.fechaSesion),
             'Tema': acuerdo.temaAgenda,
             'Descripción': acuerdo.descripcionAcuerdo,
             'Responsable': acuerdo.responsable,
             'Área': acuerdo.area,
             'Estado/Prioridad': `${acuerdo.estado} - ${acuerdo.prioridad}`,
-            'Fecha Compromiso': new Date(acuerdo.fechaCompromiso).toLocaleDateString('es-MX'),
+            'Fecha Compromiso': formatFechaLocalUTC(acuerdo.fechaCompromiso),
             'Observaciones': acuerdo.observaciones || 'Sin observaciones',
             'Total Seguimientos': acuerdo.seguimientos?.length || 0,
             'Último Seguimiento': acuerdo.seguimientos && acuerdo.seguimientos.length > 0 
-              ? new Date(acuerdo.seguimientos[0].fechaSeguimiento).toLocaleDateString('es-MX')
+              ? formatFechaLocalUTC(acuerdo.seguimientos[0].fechaSeguimiento)
               : 'Sin seguimientos'
           })
         })
@@ -109,7 +110,7 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
                 'Acuerdo ID': acuerdo.id,
                 'Sesión': `${acuerdo.tipoSesion} ${acuerdo.numeroSesion}`,
                 'Tema Acuerdo': acuerdo.temaAgenda,
-                'Fecha Seguimiento': new Date(seg.fechaSeguimiento).toLocaleDateString('es-MX'),
+                'Fecha Seguimiento': formatFechaLocalUTC(seg.fechaSeguimiento),
                 'Descripción Seguimiento': seg.seguimiento,
                 'Acción Realizada': seg.accion,
                 'Creado Por': seg.creadoPor || 'Sistema'
@@ -197,12 +198,12 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
             tableData.push([
               `Acuerdo ${(sessionIndex + 1).toString().padStart(2, '0')}`,
               `${acuerdo.tipoSesion} ${acuerdo.numeroSesion}`,
-              new Date(acuerdo.fechaSesion).toLocaleDateString('es-MX'),
+              formatFechaLocalUTC(acuerdo.fechaSesion),
               acuerdo.temaAgenda.substring(0, 25) + (acuerdo.temaAgenda.length > 25 ? '...' : ''),
               acuerdo.responsable,
               acuerdo.area,
               `${acuerdo.estado} - ${acuerdo.prioridad}`,
-              new Date(acuerdo.fechaCompromiso).toLocaleDateString('es-MX'),
+              formatFechaLocalUTC(acuerdo.fechaCompromiso),
               `${acuerdo.seguimientos?.length || 0} seg.`
             ])
           })
@@ -235,7 +236,7 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
                 startY += 8
               
                 const seguimientosData: string[][] = acuerdo.seguimientos.map(seg => [
-                  new Date(seg.fechaSeguimiento).toLocaleDateString('es-MX'),
+                  formatFechaLocalUTC(seg.fechaSeguimiento),
                   seg.seguimiento.substring(0, 80) + (seg.seguimiento.length > 80 ? '...' : ''),
                   seg.accion.substring(0, 60) + (seg.accion.length > 60 ? '...' : ''),
                   seg.creadoPor || 'Sistema'
@@ -301,7 +302,7 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
             doc.text(`Estado: ${acuerdo.estado} | Prioridad: ${acuerdo.prioridad}`, 20, yPosition)
             yPosition += lineHeight
             
-            doc.text(`Fecha Compromiso: ${new Date(acuerdo.fechaCompromiso).toLocaleDateString('es-MX')}`, 20, yPosition)
+            doc.text(`Fecha Compromiso: ${formatFechaLocalUTC(acuerdo.fechaCompromiso)}`, 20, yPosition)
             yPosition += lineHeight
             
             if (acuerdo.observaciones) {
@@ -321,7 +322,7 @@ export function ModalExportacion({ isOpen, onClose, acuerdos }: ModalExportacion
                   yPosition = 20
                 }
                 
-                doc.text(`  ${segIndex + 1}. ${new Date(seg.fechaSeguimiento).toLocaleDateString('es-MX')}`, 30, yPosition)
+                doc.text(`  ${segIndex + 1}. ${formatFechaLocalUTC(seg.fechaSeguimiento)}`, 30, yPosition)
                 yPosition += lineHeight
                 doc.text(`     ${seg.seguimiento.substring(0, 70)}`, 30, yPosition)
                 yPosition += lineHeight
