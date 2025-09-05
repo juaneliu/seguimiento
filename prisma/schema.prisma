@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model acuerdos_seguimiento {
+  id                 Int            @id @default(autoincrement())
+  numeroSesion       String
+  tipoSesion         String
+  fechaSesion        DateTime
+  temaAgenda         String
+  descripcionAcuerdo String
+  responsable        String
+  area               String
+  fechaCompromiso    DateTime
+  prioridad          String
+  estado             String         @default("Pendiente")
+  observaciones      String?
+  fechaCreacion      DateTime       @default(now())
+  fechaActualizacion DateTime
+  creadoPor          String?
+  seguimientos       seguimientos[]
+}
+
+model diagnosticos_municipales {
+  id                   Int      @id @default(autoincrement())
+  nombreActividad      String
+  municipio            String
+  actividad            String
+  solicitudUrl         String?
+  respuestaUrl         String?
+  unidadAdministrativa String
+  evaluacion           Float
+  observaciones        String?
+  acciones             Json?
+  estado               String   @default("En Proceso")
+  fechaCreacion        DateTime @default(now())
+  fechaActualizacion   DateTime
+  creadoPor            String?
+  diagnosticoUrl       String?
+  organo               String   @default("Central")
+  poder                String   @default("Ejecutivo")
+}
+
+model diagnosticos_entes {
+  id                   Int      @id @default(autoincrement())
+  nombreActividad      String
+  entePublico          String
+  actividad            String
+  solicitudUrl         String?
+  respuestaUrl         String?
+  unidadAdministrativa String
+  evaluacion           Float
+  observaciones        String?
+  acciones             Json?
+  estado               String   @default("En Proceso")
+  fechaCreacion        DateTime @default(now())
+  fechaActualizacion   DateTime
+  creadoPor            String?
+  organo               String   @default("Central")
+  poder                String   @default("Ejecutivo")
+  diagnosticoUrl       String?
+}
+
+model directorio_oic {
+  id                   Int                    @id @default(autoincrement())
+  oicNombre            String
+  puesto               String
+  nombre               String
+  correoElectronico    String
+  telefono             String?
+  direccion            String?
+  entidad              Json
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  directorio_oic_entes directorio_oic_entes[]
+}
+
+model directorio_oic_entes {
+  id              Int            @id @default(autoincrement())
+  directorioOICId Int
+  entePublicoId   Int
+  directorio_oic  directorio_oic @relation(fields: [directorioOICId], references: [id], onDelete: Cascade)
+  entes_publicos  entes_publicos @relation(fields: [entePublicoId], references: [id], onDelete: Cascade)
+
+  @@unique([directorioOICId, entePublicoId])
+}
+
+model entes_publicos {
+  id                   Int                    @id @default(autoincrement())
+  nombre               String
+  ambitoGobierno       String
+  poderGobierno        String
+  controlOIC           Boolean                @default(false)
+  controlTribunal      Boolean                @default(false)
+  sistema1             Boolean                @default(false)
+  sistema2             Boolean                @default(false)
+  sistema3             Boolean                @default(false)
+  sistema6             Boolean                @default(false)
+  entidad              Json
+  municipio            String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  directorio_oic_entes directorio_oic_entes[]
+  oficios_seguimiento  oficios_seguimiento[]
+}
+
+model oficios_seguimiento {
+  id            Int            @id @default(autoincrement())
+  enteId        Int
+  sistema       String         // "sistema1", "sistema2", "sistema3", "sistema6"
+  titulo        String
+  descripcion   String?
+  urlPdf        String
+  fechaOficio   DateTime
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  creadoPor     String?
+  ente          entes_publicos @relation(fields: [enteId], references: [id], onDelete: Cascade)
+
+  @@index([enteId])
+  @@index([sistema])
+}
+
+model seguimientos {
+  id                   Int                  @id @default(autoincrement())
+  acuerdoId            Int
+  seguimiento          String
+  accion               String
+  fechaSeguimiento     DateTime             @default(now())
+  fechaCreacion        DateTime             @default(now())
+  fechaActualizacion   DateTime
+  creadoPor            String?
+  acuerdos_seguimiento acuerdos_seguimiento @relation(fields: [acuerdoId], references: [id], onDelete: Cascade)
+
+  @@index([acuerdoId])
+}
+
+model usuarios {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  nombre       String
+  apellido     String
+  password     String?
+  rol          RolUsuario  @default(INVITADO)
+  activo       Boolean     @default(true)
+  ultimoAcceso DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  auditLogs    AuditLogs[]
+}
+
+model AuditLogs {
+  id                Int      @id @default(autoincrement())
+  usuarioId         Int      @map("usuario_id")
+  accion            String   @map("accion")
+  tabla             String   @map("tabla")
+  registroId        Int?     @map("registro_id")
+  valoresAnteriores Json?    @map("valores_anteriores")
+  valoresNuevos     Json?    @map("valores_nuevos")
+  direccionIP       String?  @map("direccion_ip")
+  fechaCreacion     DateTime @default(now()) @map("fecha_creacion")
+  usuario           usuarios @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId])
+  @@map("audit_logs")
+}
+
+enum RolUsuario {
+  INVITADO
+  OPERATIVO
+  SEGUIMIENTO
+  ADMINISTRADOR
+}

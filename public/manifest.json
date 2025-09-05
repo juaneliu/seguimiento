@@ -1,0 +1,34 @@
+{
+  "name": "Plataforma de Seguimiento, Ejecución y Evaluación del Sistema Anticorrupción del Estado de Morelos",
+  "short_name": "Plataforma SAEM",
+  "description": "Plataforma integral para el seguimiento, ejecución y evaluación del Sistema Estatal Anticorrupción del Estado de Morelos",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/favicon.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "screenshots": [],
+  "shortcuts": [],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "protocol_handlers": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}
