@@ -38,9 +38,6 @@ const getColorByPromedio = (promedio: number): string => {
 const extractMunicipioFromEnte = (ente: string): string => {
   if (!ente) return ente
   
-  // Debug log temporal para verificar funcionamiento
-  console.log('🔍 Procesando ente:', ente)
-  
   // Patrones para extraer el municipio de diferentes tipos de entes
   const patterns = [
     // Sistema de Agua: "Sistema Operador de Agua Potable y Saneamiento del Municipio de [Municipio]"
@@ -58,14 +55,11 @@ const extractMunicipioFromEnte = (ente: string): string => {
   for (const pattern of patterns) {
     const match = ente.match(pattern)
     if (match && match[1]) {
-      const municipioExtraido = match[1].trim()
-      console.log('✅ Municipio extraído:', municipioExtraido, 'de ente:', ente)
-      return municipioExtraido
+      return match[1].trim()
     }
   }
   
   // Si no coincide con ningún patrón, devolver el nombre original
-  console.log('❌ No se encontró patrón para:', ente)
   return ente
 }
 
