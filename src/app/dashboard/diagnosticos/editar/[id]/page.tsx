@@ -37,6 +37,12 @@ const formSchema = z.object({
   nombreActividad: z.string().min(1, "Requerido"),
   municipio: z.string().min(1, "Requerido"),
   actividad: z.enum(["Diagnóstico", "Indicador", "Índice"]),
+  poder: z.enum(["Ejecutivo", "Legislativo", "Judicial", "Autónomo"], {
+    required_error: "Selecciona un poder",
+  }),
+  organo: z.enum(["Central", "Descentralizado", "Desconcentrado", "No sectorizado"], {
+    required_error: "Selecciona un órgano",
+  }),
   solicitudUrl: z.string().optional(),
   respuestaUrl: z.string().optional(),
   unidadAdministrativa: z.string().min(1, "Requerido"),
@@ -76,6 +82,8 @@ export default function EditarDiagnosticoPage() {
       nombreActividad: "",
       municipio: "",
       actividad: "Diagnóstico",
+      poder: undefined,
+      organo: undefined,
       solicitudUrl: "",
       respuestaUrl: "",
       unidadAdministrativa: "",
@@ -103,6 +111,8 @@ export default function EditarDiagnosticoPage() {
           nombreActividad: data.nombreActividad || "",
           municipio: data.municipio || "",
           actividad: data.actividad || "Diagnóstico",
+          poder: data.poder || undefined,
+          organo: data.organo || undefined,
           solicitudUrl: data.solicitudUrl || "",
           respuestaUrl: data.respuestaUrl || "",
           unidadAdministrativa: data.unidadAdministrativa || "",
@@ -585,6 +595,79 @@ Esta acción NO se puede deshacer.`,
                             </Select>
                             <FormDescription>
                               Categoría del diagnóstico que se aplicará al municipio seleccionado
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Poder y Órgano */}
+                    <div className="form-grid-fixed">
+                      <FormField
+                        control={form.control}
+                        name="poder"
+                        render={({ field }) => (
+                          <FormItem className="form-container-fixed">
+                            <FormLabel>Poder *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="select-trigger-fixed">
+                                  <SelectValue placeholder="Selecciona un poder" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent 
+                                className="select-content-portal max-h-[200px] min-w-[200px]"
+                                position="popper"
+                                side="bottom" 
+                                align="start"
+                                sideOffset={8}
+                                avoidCollisions={false}
+                                collisionPadding={0}
+                              >
+                                <SelectItem value="Ejecutivo">Ejecutivo</SelectItem>
+                                <SelectItem value="Legislativo">Legislativo</SelectItem>
+                                <SelectItem value="Judicial">Judicial</SelectItem>
+                                <SelectItem value="Autónomo">Autónomo</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              Poder al que pertenece el municipio
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="organo"
+                        render={({ field }) => (
+                          <FormItem className="form-container-fixed">
+                            <FormLabel>Órgano *</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="select-trigger-fixed">
+                                  <SelectValue placeholder="Selecciona un órgano" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent 
+                                className="select-content-portal max-h-[200px] min-w-[200px]"
+                                position="popper"
+                                side="bottom" 
+                                align="start"
+                                sideOffset={8}
+                                avoidCollisions={false}
+                                collisionPadding={0}
+                              >
+                                <SelectItem value="Central">Central</SelectItem>
+                                <SelectItem value="Descentralizado">Descentralizado</SelectItem>
+                                <SelectItem value="Desconcentrado">Desconcentrado</SelectItem>
+                                <SelectItem value="No sectorizado">No sectorizado</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              Tipo de órgano administrativo
                             </FormDescription>
                             <FormMessage />
                           </FormItem>

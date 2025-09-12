@@ -34,12 +34,50 @@ const getColorByPromedio = (promedio: number): string => {
   return "#64748b" // slate-500 - Sin datos
 }
 
+// Función para extraer el nombre real del municipio de entes como Sistemas de Agua y DIF
+const extractMunicipioFromEnte = (ente: string): string => {
+  if (!ente) return ente
+  
+  // Debug log temporal para verificar funcionamiento
+  console.log('🔍 Procesando ente:', ente)
+  
+  // Patrones para extraer el municipio de diferentes tipos de entes
+  const patterns = [
+    // Sistema de Agua: "Sistema Operador de Agua Potable y Saneamiento del Municipio de [Municipio]"
+    /Sistema Operador de Agua Potable y Saneamiento del Municipio de (.+)/i,
+    // Sistema de Agua: "Sistema de Agua Potable y Saneamiento de [Municipio]"
+    /Sistema de Agua Potable y Saneamiento de (.+)/i,
+    // Sistema de Agua: "Sistema de Conservación de Agua Potable y Saneamiento de [Municipio]"
+    /Sistema de Conservación de Agua Potable y Saneamiento de (.+)/i,
+    // Sistema de Agua: "Sistema de Agua Potable y Alcantarillado de Municipio de [Municipio]"
+    /Sistema de Agua Potable y Alcantarillado de Municipio de (.+)/i,
+    // DIF Municipal: "Sistema Municipal DIF de [Municipio]"
+    /Sistema Municipal DIF de (.+)/i
+  ]
+  
+  for (const pattern of patterns) {
+    const match = ente.match(pattern)
+    if (match && match[1]) {
+      const municipioExtraido = match[1].trim()
+      console.log('✅ Municipio extraído:', municipioExtraido, 'de ente:', ente)
+      return municipioExtraido
+    }
+  }
+  
+  // Si no coincide con ningún patrón, devolver el nombre original
+  console.log('❌ No se encontró patrón para:', ente)
+  return ente
+}
+
 // Función para normalizar nombres de municipios y obtener la imagen correspondiente
 const getMunicipioIcon = (municipio: string): string => {
   if (!municipio) return '/img/municipios/default.gif'
   
+  // Extraer el nombre real del municipio si es un ente especial
+  const municipioReal = extractMunicipioFromEnte(municipio)
+  
   // Normalizar el nombre del municipio para que coincida con los archivos
-  const normalized = municipio
+  const normalized = municipioReal
     .toLowerCase()
     .replace(/\s+/g, '')
     .replace(/[áä]/g, 'a')

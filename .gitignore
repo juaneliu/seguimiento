@@ -124,3 +124,7 @@ nginx-fixed.conf
 # OS generated files
 Thumbs.db
 ehthumbs.db
+# Archivos que no deben regenerarse
+SOLUCION-502-GATEWAY.md
+backup-database.sh
+ecosystem.simple.js
